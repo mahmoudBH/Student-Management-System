@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensio
 
 const { width, height } = Dimensions.get('window');
 
-const SignupForm = ({ navigation }) => {
+const Login = ({ navigation }) => {
     const pulseAnim = new Animated.Value(1);
 
     Animated.loop(
@@ -22,38 +22,9 @@ const SignupForm = ({ navigation }) => {
                     <View style={styles.titleContainer}>
                         <View style={styles.dot} />
                         <Animated.View style={[styles.dot, { transform: [{ scale: pulseAnim }] }]} />
-                        <Text style={styles.title}>Register</Text>
+                        <Text style={styles.title}>Login</Text>
                     </View>
-                    <Text style={styles.message}>Signup now and get full access to our app.</Text>
-                    
-                    <View style={styles.flex}>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                onFocus={() => setFocusedInput({ firstname: true })}
-                                onBlur={() => setFocusedInput({ firstname: false })}
-                            />
-                            <Text style={[
-                                styles.label, 
-                                focusedInput.firstname ? styles.labelFocused : {}
-                            ]}>
-                                Firstname
-                            </Text>
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                onFocus={() => setFocusedInput({ lastname: true })}
-                                onBlur={() => setFocusedInput({ lastname: false })}
-                            />
-                            <Text style={[
-                                styles.label, 
-                                focusedInput.lastname ? styles.labelFocused : {}
-                            ]}>
-                                Lastname
-                            </Text>
-                        </View>
-                    </View>
+                    <Text style={styles.message}>Login to access your account.</Text>
 
                     <View style={styles.inputContainer}>
                         <TextInput
@@ -83,31 +54,17 @@ const SignupForm = ({ navigation }) => {
                             Password
                         </Text>
                     </View>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            secureTextEntry
-                            onFocus={() => setFocusedInput({ confirmPassword: true })}
-                            onBlur={() => setFocusedInput({ confirmPassword: false })}
-                        />
-                        <Text style={[
-                            styles.label, 
-                            focusedInput.confirmPassword ? styles.labelFocused : {}
-                        ]}>
-                            Confirm Password
-                        </Text>
-                    </View>
 
                     <TouchableOpacity style={styles.submit}>
-                        <Text style={styles.submitText}>Submit</Text>
+                        <Text style={styles.submitText}>Login</Text>
                     </TouchableOpacity>
-                    <Text style={styles.signin}>
-                        Already have an account?{' '}
+                    <Text style={styles.text}>
+                        Don’t have an account?{' '}
                         <Text
-                            style={styles.signinLink}
-                            onPress={() => navigation.navigate('Login')}
+                            style={styles.link}
+                            onPress={() => navigation.navigate('SignupForm')}
                         >
-                            Login
+                            Sign Up
                         </Text>
                     </Text>
                 </View>
@@ -166,12 +123,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         textAlign: 'center',
     },
-    flex: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginBottom: 10,
-    },
     inputContainer: {
         position: 'relative',
         flex: 1,
@@ -212,15 +163,15 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
-    signin: {
+    text: {
         color: 'rgba(88, 87, 87, 0.822)',
         textAlign: 'center',
         marginTop: 10,
     },
-    signinLink: {
+    link: {
         color: 'royalblue',
         textDecorationLine: 'underline',
     },
 });
 
-export default SignupForm;
+export default Login;
