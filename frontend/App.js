@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import GetStartedButton from './components/Getstarted'; // Adjust the import path if necessary
 import Login from './components/Login'; // Adjust the import path if necessary
 import SignupForm from './components/Signup'; // Adjust the import path if necessary
+import Home from './components/Home'; // Assurez-vous que le chemin d'import est correct
 
 const Stack = createStackNavigator();
 
@@ -20,12 +21,17 @@ const App = () => {
         <Stack.Screen 
           name="Login" 
           component={Login} 
-          options={{ title: 'Login' }} // Optional title for the Login screen
+          options={{ title: 'Login' }} 
         />
         <Stack.Screen 
           name="SignupForm" 
           component={SignupForm} 
-          options={{ title: 'Sign Up' }} // Optional title for the Signup screen
+          options={{ title: 'Sign Up' }} 
+        />
+        <Stack.Screen 
+          name="Home" 
+          component={Home} 
+          options={{ title: 'Welcome' }} // Optional title for the Home screen
         />
       </Stack.Navigator>
     </NavigationContainer>

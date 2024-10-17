@@ -1,5 +1,7 @@
+// Login.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,7 +15,36 @@ const Login = ({ navigation }) => {
         ])
     ).start();
 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [focusedInput, setFocusedInput] = useState({});
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://172.16.27.191:5000/api/login', {
+                email,
+                password,
+            });
+
+            if (response.data.success) {
+                Alert.alert('Succès', 'Connexion réussie!');
+                navigation.navigate('Home', {
+                    firstname: response.data.firstname,
+                    lastname: response.data.lastname,
+                });
+            } else {
+                Alert.alert('Erreur', 'Email ou mot de passe incorrect.');
+            }
+        } catch (error) {
+            Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer plus tard.');
+            console.error(error);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -29,33 +60,39 @@ const Login = ({ navigation }) => {
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
+                            placeholder=" "
                             keyboardType="email-address"
                             onFocus={() => setFocusedInput({ email: true })}
                             onBlur={() => setFocusedInput({ email: false })}
+                            value={email}
+                            onChangeText={setEmail}
                         />
-                        <Text style={[
-                            styles.label, 
-                            focusedInput.email ? styles.labelFocused : {}
+                        <Animated.Text style={[
+                            styles.label,
+                            focusedInput.email || email.length > 0 ? styles.labelFocused : {}
                         ]}>
                             Email
-                        </Text>
+                        </Animated.Text>
                     </View>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
+                            placeholder=" "
                             secureTextEntry
                             onFocus={() => setFocusedInput({ password: true })}
                             onBlur={() => setFocusedInput({ password: false })}
+                            value={password}
+                            onChangeText={setPassword}
                         />
-                        <Text style={[
-                            styles.label, 
-                            focusedInput.password ? styles.labelFocused : {}
+                        <Animated.Text style={[
+                            styles.label,
+                            focusedInput.password || password.length > 0 ? styles.labelFocused : {}
                         ]}>
                             Password
-                        </Text>
+                        </Animated.Text>
                     </View>
 
-                    <TouchableOpacity style={styles.submit}>
+                    <TouchableOpacity style={styles.submit} onPress={handleLogin}>
                         <Text style={styles.submitText}>Login</Text>
                     </TouchableOpacity>
                     <Text style={styles.text}>
@@ -145,6 +182,7 @@ const styles = StyleSheet.create({
         top: 18,
         color: 'grey',
         fontSize: 14,
+        transition: '0.2s', // Optional for smooth transition
     },
     labelFocused: {
         top: 4,

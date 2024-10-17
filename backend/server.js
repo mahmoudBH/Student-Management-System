@@ -41,6 +41,22 @@ app.post('/api/signup', (req, res) => {
     });
   });
   
+  app.post('/api/login', (req, res) => {
+    console.log('Tentative de connexion');
+    const { email, password } = req.body;
+  
+    const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
+    db.query(sql, [email, password], (err, results) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: 'Une erreur est survenue.' });
+      }
+      if (results.length > 0) {
+        return res.status(200).json({ success: true, message: 'Connexion réussie!' });
+      } else {
+        return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
+      }
+    });
+  });  
 
 // Lancer le serveur
 app.listen(port, () => {
