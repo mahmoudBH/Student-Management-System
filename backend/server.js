@@ -22,11 +22,6 @@ db.connect(err => {
   if (err) throw err;
   console.log('Connecté à la base de données MySQL');
 });
-
-app.get('/api/test', (req, res) => {
-    res.send('La route de test fonctionne!');
-  });
-
 // Route pour l'inscription
 app.post('/api/signup', (req, res) => {
     const { firstname, lastname, email, password } = req.body;
