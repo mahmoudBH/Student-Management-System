@@ -1,32 +1,50 @@
 // App.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import GetStartedButton from './components/Getstarted'; // Adjust the import path if necessary
-import Login from './components/Login'; // Adjust the import path if necessary
-import SignupForm from './components/Signup'; // Adjust the import path if necessary
-import Home from './components/Home'; // Ensure the import path is correct
+import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
+import { View, Text, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // Ensure this is installed
+import GetStartedButton from './components/Getstarted'; 
+import Login from './components/Login'; 
+import SignupForm from './components/Signup'; 
+import Home from './components/Home'; 
 
-const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const HomeStack = () => {
+const CustomDrawerContent = (props) => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen 
-        name=" Home Screen" 
-        component={Home} 
-      />
-      {/* Vous pouvez ajouter d'autres écrans ici si nécessaire */}
-    </Stack.Navigator>
+    <View style={styles.drawerContent}>
+      <Text style={styles.drawerHeader}>My App</Text>
+      <DrawerItemList {...props} />
+    </View>
   );
 };
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Drawer.Navigator initialRouteName="GetStartedButton">
+      <Drawer.Navigator
+        initialRouteName="GetStartedButton"
+        screenOptions={{
+          drawerStyle: {
+            backgroundColor: '#f4f4f4',
+            width: 240,
+          },
+          drawerLabelStyle: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: '#333',
+          },
+          headerStyle: {
+            backgroundColor: '#6200ee',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+      >
         <Drawer.Screen 
           name="GetStartedButton" 
           component={GetStartedButton} 
@@ -35,21 +53,51 @@ const App = () => {
         <Drawer.Screen 
           name="Login" 
           component={Login} 
-          options={{ title: 'Login' }} 
+          options={{ 
+            title: 'Login', 
+            drawerIcon: ({ color }) => (
+              <MaterialCommunityIcons name="login" color={color} size={20} />
+            ) 
+          }} 
         />
         <Drawer.Screen 
           name="SignupForm" 
           component={SignupForm} 
-          options={{ title: 'Sign Up' }} 
+          options={{ 
+            title: 'Sign Up', 
+            drawerIcon: ({ color }) => (
+              <MaterialCommunityIcons name="account-plus" color={color} size={20} />
+            ) 
+          }} 
         />
         <Drawer.Screen 
-          name="Home" // Change from Home to HomeStack
-          component={HomeStack} 
-          options={{ title: 'Home' }} 
+          name="Home" 
+          component={Home} 
+          options={{ 
+            title: 'Home', 
+            drawerIcon: ({ color }) => (
+              <MaterialCommunityIcons name="home" color={color} size={20} />
+            ) 
+          }} 
         />
       </Drawer.Navigator>
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  drawerContent: {
+    flex: 1,
+    paddingTop: 40,
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
+  },
+  drawerHeader: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#6200ee',
+    marginBottom: 20,
+  },
+});
 
 export default App;

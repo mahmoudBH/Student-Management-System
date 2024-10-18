@@ -9,7 +9,7 @@ const Home = () => {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch('http://172.16.26.110:5000/api/session', {
+        const response = await fetch('http://172.16.27.191:5000/api/session', {
           method: 'GET',
           credentials: 'include', // Important for session management
         });

@@ -9,7 +9,7 @@ const port = 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://172.16.26.110:8082', // Adjust this to match your React Native development server
+  origin: 'http://172.16.27.191:8082', // Adjust this to match your React Native development server
   credentials: true, // Enable credentials for session handling
 }));
 app.use(bodyParser.json());
@@ -26,7 +26,7 @@ app.use(session({
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '2d4b88bg',
+  password: 'mahmoud bh',
   database: 'gestion_etudiant'
 });
 
