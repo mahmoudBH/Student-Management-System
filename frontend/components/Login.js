@@ -1,19 +1,25 @@
 // Login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
-import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
 const Login = ({ navigation }) => {
     const pulseAnim = new Animated.Value(1);
 
-    Animated.loop(
-        Animated.sequence([
-            Animated.timing(pulseAnim, { toValue: 1.8, duration: 1000, useNativeDriver: true }),
-            Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-        ])
-    ).start();
+    // Start the animation on component mount
+    useEffect(() => {
+        const animationLoop = Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, { toValue: 1.8, duration: 1000, useNativeDriver: true }),
+                Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+            ])
+        );
+        animationLoop.start();
+
+        // Cleanup function to stop the animation
+        return () => animationLoop.stop();
+    }, [pulseAnim]);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,23 +32,37 @@ const Login = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://172.16.27.191:5000/api/login', {
-                email,
-                password,
+            const response = await fetch('http://172.16.26.110:5000/api/login', { // Use this for Android emulator
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
             });
 
-            if (response.data.success) {
+            // Check if the response is ok (status in the range 200-299)
+            if (!response.ok) {
+                const errorData = await response.json(); // Get error details
+                throw new Error(errorData.message || 'Une erreur est survenue lors de la connexion.');
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
                 Alert.alert('Succès', 'Connexion réussie!');
                 navigation.navigate('Home', {
-                    firstname: response.data.firstname,
-                    lastname: response.data.lastname,
+                    firstname: data.firstname,
+                    lastname: data.lastname,
                 });
             } else {
                 Alert.alert('Erreur', 'Email ou mot de passe incorrect.');
             }
         } catch (error) {
-            Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer plus tard.');
-            console.error(error);
+            Alert.alert('Erreur', error.message || 'Une erreur est survenue. Veuillez réessayer plus tard.');
+            console.error('Login Error:', error);
         }
     };
 

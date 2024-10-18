@@ -1,13 +1,46 @@
 // Home.js
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 const Home = ({ route }) => {
-  const { firstname, lastname } = route.params || {}; // Assurez-vous d'extraire les valeurs des paramètres
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const response = await fetch('http://172.16.26.110:5000/api/session', {
+          method: 'GET',
+          credentials: 'include', // Important for session management
+        });
+        const data = await response.json();
+        if (data.loggedIn) {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error('Error fetching session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSession();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.welcomeText}>Welcome, {firstname} {lastname}!</Text>
+      {user ? (
+        <Text style={styles.welcomeText}>Welcome, {user.firstname} {user.lastname}!</Text>
+      ) : (
+        <Text style={styles.welcomeText}>Not logged in.</Text>
+      )}
     </View>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
 
+
 const { width } = Dimensions.get('window');
 
 const SignupForm = ({ navigation }) => {
@@ -29,7 +30,7 @@ const SignupForm = ({ navigation }) => {
         const data = { firstname, lastname, email, password };
 
         // Envoie des données à l'API backend
-        fetch('http://172.16.27.191:5000/api/signup', {
+        fetch('http://172.16.26.110:5000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
