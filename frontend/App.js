@@ -2,38 +2,52 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import GetStartedButton from './components/Getstarted'; // Adjust the import path if necessary
 import Login from './components/Login'; // Adjust the import path if necessary
 import SignupForm from './components/Signup'; // Adjust the import path if necessary
-import Home from './components/Home'; // Assurez-vous que le chemin d'import est correct
+import Home from './components/Home'; // Ensure the import path is correct
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name=" Home Screen" 
+        component={Home} 
+      />
+      {/* Vous pouvez ajouter d'autres écrans ici si nécessaire */}
+    </Stack.Navigator>
+  );
+};
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="GetStartedButton">
-        <Stack.Screen 
+      <Drawer.Navigator initialRouteName="GetStartedButton">
+        <Drawer.Screen 
           name="GetStartedButton" 
           component={GetStartedButton} 
           options={{ headerShown: false }} 
         />
-        <Stack.Screen 
+        <Drawer.Screen 
           name="Login" 
           component={Login} 
           options={{ title: 'Login' }} 
         />
-        <Stack.Screen 
+        <Drawer.Screen 
           name="SignupForm" 
           component={SignupForm} 
           options={{ title: 'Sign Up' }} 
         />
-        <Stack.Screen 
-          name="Home" 
-          component={Home} 
-          options={{ title: 'Welcome' }} // Optional title for the Home screen
+        <Drawer.Screen 
+          name="Home" // Change from Home to HomeStack
+          component={HomeStack} 
+          options={{ title: 'Home' }} 
         />
-      </Stack.Navigator>
+      </Drawer.Navigator>
     </NavigationContainer>
   );
 };

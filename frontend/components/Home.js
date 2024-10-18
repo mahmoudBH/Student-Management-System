@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
-const Home = ({ route }) => {
+const Home = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
