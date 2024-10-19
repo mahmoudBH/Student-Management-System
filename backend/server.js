@@ -3,13 +3,12 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session'); // Import express-session
-
 const app = express();
 const port = 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://172.16.27.191:8082', // Adjust this to match your React Native development server
+  origin: 'http://192.168.1.164:8082', // Adjust this to match your React Native development server
   credentials: true, // Enable credentials for session handling
 }));
 app.use(bodyParser.json());
@@ -77,7 +76,17 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// Route to check session
+// Route de déconnexion
+app.post('/api/logout', (req, res) => {
+  req.session.destroy(err => {
+      if (err) {
+          return res.status(500).json({ success: false, message: 'Could not log out.' });
+      }
+      res.json({ success: true, message: 'Logged out successfully.' });
+  });
+});
+
+
 // Route to check session
 app.get('/api/session', (req, res) => {
   if (req.session.user) {
@@ -85,6 +94,13 @@ app.get('/api/session', (req, res) => {
   }
   return res.status(401).json({ loggedIn: false, message: 'No user logged in.' });
 });
+
+// Middleware d'erreur
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
 
 
 // Start the server

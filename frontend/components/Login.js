@@ -32,7 +32,7 @@ const Login = ({ navigation }) => {
         }
 
         try {
-            const response = await fetch('http://172.16.27.191:5000/api/login', { // Use this for Android emulator
+            const response = await fetch('http://192.168.1.164:5000/api/login', { // Use this for Android emulator
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

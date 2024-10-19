@@ -3,11 +3,11 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { View, Text, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Ensure this is installed
-import GetStartedButton from './components/Getstarted'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Login from './components/Login'; 
 import SignupForm from './components/Signup'; 
 import Home from './components/Home'; 
+import Logout from './components/Logout'; // Importer le composant Logout
 
 const Drawer = createDrawerNavigator();
 
@@ -24,7 +24,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Drawer.Navigator
-        initialRouteName="GetStartedButton"
+        initialRouteName="Login"
         screenOptions={{
           drawerStyle: {
             backgroundColor: '#f4f4f4',
@@ -45,11 +45,6 @@ const App = () => {
         }}
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
-        <Drawer.Screen 
-          name="GetStartedButton" 
-          component={GetStartedButton} 
-          options={{ headerShown: false }} 
-        />
         <Drawer.Screen 
           name="Login" 
           component={Login} 
@@ -77,6 +72,16 @@ const App = () => {
             title: 'Home', 
             drawerIcon: ({ color }) => (
               <MaterialCommunityIcons name="home" color={color} size={20} />
+            ) 
+          }} 
+        />
+        <Drawer.Screen 
+          name="Logout" 
+          component={Logout} 
+          options={{ 
+            title: 'Logout', 
+            drawerIcon: ({ color }) => (
+              <MaterialCommunityIcons name="logout" color={color} size={20} />
             ) 
           }} 
         />
