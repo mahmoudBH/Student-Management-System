@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
@@ -7,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Login from './components/Login'; 
 import SignupForm from './components/Signup'; 
 import Home from './components/Home'; 
-import Logout from './components/Logout'; // Importer le composant Logout
+import Logout from './components/Logout'; // Import the Logout component
 
 const Drawer = createDrawerNavigator();
 

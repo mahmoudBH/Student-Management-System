@@ -1,13 +1,12 @@
-// Login.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajoute AsyncStorage pour stocker le token
 
 const { width, height } = Dimensions.get('window');
 
 const Login = ({ navigation }) => {
     const pulseAnim = new Animated.Value(1);
 
-    // Start the animation on component mount
     useEffect(() => {
         const animationLoop = Animated.loop(
             Animated.sequence([
@@ -17,7 +16,6 @@ const Login = ({ navigation }) => {
         );
         animationLoop.start();
 
-        // Cleanup function to stop the animation
         return () => animationLoop.stop();
     }, [pulseAnim]);
 
@@ -32,7 +30,7 @@ const Login = ({ navigation }) => {
         }
 
         try {
-            const response = await fetch('http://192.168.1.164:5000/api/login', { // Use this for Android emulator
+            const response = await fetch('http://192.168.53.100:5000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,15 +41,16 @@ const Login = ({ navigation }) => {
                 }),
             });
 
-            // Check if the response is ok (status in the range 200-299)
             if (!response.ok) {
-                const errorData = await response.json(); // Get error details
+                const errorData = await response.json();
                 throw new Error(errorData.message || 'Une erreur est survenue lors de la connexion.');
             }
 
             const data = await response.json();
 
             if (data.success) {
+                // Stocker le token JWT dans AsyncStorage
+                await AsyncStorage.setItem('token', data.token);
                 Alert.alert('Succès', 'Connexion réussie!');
                 navigation.navigate('Home', {
                     firstname: data.firstname,

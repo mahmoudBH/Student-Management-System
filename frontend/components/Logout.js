@@ -1,13 +1,13 @@
-// Logout.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const Logout = ({ navigation }) => {
     const handleLogout = async () => {
         try {
-            const response = await fetch('http://192.168.1.164:5000/api/logout', {
+            const response = await fetch('http://192.168.53.100:5000/api/logout', {
                 method: 'POST',
-                credentials: 'include', // Pour inclure les cookies de session
+                credentials: 'include', // Include cookies for session logout
             });
     
             if (!response.ok) {
@@ -17,8 +17,16 @@ const Logout = ({ navigation }) => {
             const data = await response.json();
     
             if (data.success) {
+                // Remove token from AsyncStorage
+                await AsyncStorage.removeItem('token');
+                
                 Alert.alert('Succès', 'Déconnexion réussie!');
-                navigation.navigate('Login'); // Redirige l'utilisateur vers la page de connexion
+                
+                // Reset the navigation stack to the Login screen
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' }],
+                });
             } else {
                 Alert.alert('Erreur', data.message);
             }
@@ -27,7 +35,6 @@ const Logout = ({ navigation }) => {
             console.error('Logout Error:', error);
         }
     };
-    
 
     return (
         <View style={styles.container}>
