@@ -69,16 +69,19 @@ const App = () => {
         {/* If the user is not logged in, show Login and Signup */}
         {!isLoggedIn ? (
           <>
-            <Drawer.Screen
-              name="Login"
-              component={(props) => <Login {...props} setIsLoggedIn={setIsLoggedIn} />} // Pass setIsLoggedIn and navigation props
-              options={{
-                title: 'Login',
+            <Drawer.Screen 
+              name="Login" 
+              options={{ 
+                title: 'Login', 
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="login" color={color} size={20} />
-                ),
+                ) 
               }}
-            />
+            >
+              {(props) => <Login {...props} setIsLoggedIn={setIsLoggedIn} />}
+            </Drawer.Screen>
+
+
             <Drawer.Screen
               name="SignupForm"
               component={SignupForm}
