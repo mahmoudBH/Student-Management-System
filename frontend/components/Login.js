@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajoute 
 
 const { width, height } = Dimensions.get('window');
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation, setIsLoggedIn }) => {
     const pulseAnim = new Animated.Value(1);
 
     useEffect(() => {
@@ -52,6 +52,11 @@ const Login = ({ navigation }) => {
                 // Stocker le token JWT dans AsyncStorage
                 await AsyncStorage.setItem('token', data.token);
                 Alert.alert('Succès', 'Connexion réussie!');
+                
+                // Update login state after successful login
+                setIsLoggedIn(true);
+
+                // Navigate to Home after login
                 navigation.navigate('Home', {
                     firstname: data.firstname,
                     lastname: data.lastname,
@@ -201,7 +206,7 @@ const styles = StyleSheet.create({
         top: 18,
         color: 'grey',
         fontSize: 14,
-        transition: '0.2s', // Optional for smooth transition
+        transition: '0.2s',
     },
     labelFocused: {
         top: 4,
