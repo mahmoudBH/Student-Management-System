@@ -30,7 +30,7 @@ const SignupForm = ({ navigation }) => {
         const data = { firstname, lastname, email, password };
 
         // Envoie des données à l'API backend
-        fetch('http://192.168.53.100:5000/api/signup', {
+        fetch('http://192.168.158.100:5000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

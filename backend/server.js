@@ -9,7 +9,7 @@ const port = 5000;
 
 // Middleware
 app.use(cors({
-    origin: 'http://192.168.53.100:8082', // Adjust this to match your React Native development server
+    origin: 'http://192.168.158.100:8082', // Adjust this to match your React Native development server
     credentials: true, // Enable credentials for session handling
 }));
 app.use(bodyParser.json());
@@ -137,6 +137,30 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
+
+// Profile endpoint
+app.get('/api/profile', authenticateToken, (req, res) => {
+    const userId = req.user.id; // Get the user ID from the token
+
+    // Query to get user data from the database
+    const sql = 'SELECT id, firstname, lastname, email FROM users WHERE id = ?';
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err); // Log the error for debugging
+            return res.status(500).json({ success: false, message: 'Error retrieving profile.' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        // Return the user profile information, excluding the password
+        const userProfile = results[0]; // Get the first user from results
+        res.json(userProfile);
+    });
+});
+
+
 
 // Start the server
 app.listen(port, () => {

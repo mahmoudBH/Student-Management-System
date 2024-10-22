@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // To store and retrieve the token
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Login from './components/Login';
 import SignupForm from './components/Signup';
 import Home from './components/Home';
-import Logout from './components/Logout'; // Ensure this is correctly imported
+import Logout from './components/Logout';
+import Profile from './components/Profile'; // Import Profile component
 
 const Drawer = createDrawerNavigator();
 
@@ -23,21 +24,19 @@ const CustomDrawerContent = (props) => {
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
 
-  // Function to check the token and update login status
   const checkLoginStatus = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       if (token) {
-        setIsLoggedIn(true); // User is logged in if a valid token is found
+        setIsLoggedIn(true);
       } else {
-        setIsLoggedIn(false); // No token, so user is not logged in
+        setIsLoggedIn(false);
       }
     } catch (error) {
       console.error('Error checking login status:', error);
     }
   };
 
-  // Check login status when the app loads
   useEffect(() => {
     checkLoginStatus();
   }, []);
@@ -66,7 +65,6 @@ const App = () => {
         }}
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
-        {/* If the user is not logged in, show Login and Signup */}
         {!isLoggedIn ? (
           <>
             <Drawer.Screen 
@@ -81,7 +79,6 @@ const App = () => {
               {(props) => <Login {...props} setIsLoggedIn={setIsLoggedIn} />}
             </Drawer.Screen>
 
-
             <Drawer.Screen
               name="SignupForm"
               component={SignupForm}
@@ -95,7 +92,6 @@ const App = () => {
           </>
         ) : (
           <>
-            {/* If the user is logged in, show Home and Logout */}
             <Drawer.Screen
               name="Home"
               component={Home}
@@ -107,6 +103,17 @@ const App = () => {
               }}
             />
             <Drawer.Screen 
+              name="Profile" 
+              options={{ 
+                title: 'Profile', 
+                drawerIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="account" color={color} size={20} />
+                ) 
+              }}
+            >
+              {(props) => <Profile {...props} setIsLoggedIn={setIsLoggedIn} />}
+            </Drawer.Screen>
+            <Drawer.Screen 
               name="Logout" 
               options={{ 
                 title: 'Logout', 
@@ -117,7 +124,6 @@ const App = () => {
             >
               {() => <Logout setIsLoggedIn={setIsLoggedIn} />}
             </Drawer.Screen>
-
           </>
         )}
       </Drawer.Navigator>
