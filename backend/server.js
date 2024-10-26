@@ -5,11 +5,11 @@ const cors = require('cors');
 const session = require('express-session'); // Import express-session
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const app = express();
-const port = 5000;
+const port = 3000;
 
 // Middleware
 app.use(cors({
-    origin: 'http://192.168.158.100:8082', // Adjust this to match your React Native development server
+    origin: 'http://172.16.27.219:8081', // Adjust this to match your React Native development server
     credentials: true, // Enable credentials for session handling
 }));
 app.use(bodyParser.json());
@@ -138,6 +138,39 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
+
+// Définir l'API pour récupérer les notes
+app.get('/api/notes', authenticateToken, (req, res) => {
+    const userId = req.user.id; // Obtenez l'ID de l'utilisateur à partir du token
+    const sql = 'SELECT * FROM note WHERE userId = ?'; // Utiliser user_id pour filtrer
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving notes:', err);
+            return res.status(500).json({ success: false, message: 'Error retrieving notes.' });
+        }
+
+        res.json(results); // Retournez les notes en JSON
+    });
+});
+
+app.post('/api/notes', authenticateToken, (req, res) => {
+    const { firstname, lastname, note, class: className, matiere } = req.body;
+    const userId = req.user.id; // Obtenez l'ID de l'utilisateur à partir du token
+
+    const sql = 'INSERT INTO note (firstname, lastname, note, class, matiere, user_id) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(sql, [firstname, lastname, note, className, matiere, userId], (err, result) => {
+        if (err) {
+            console.error('Error adding note:', err);
+            return res.status(500).json({ success: false, message: 'Error adding note.' });
+        }
+        return res.status(201).json({ success: true, message: 'Note added successfully!' });
+    });
+});
+
+
+
+
 // Profile endpoint
 app.get('/api/profile', authenticateToken, (req, res) => {
     const userId = req.user.id; // Get the user ID from the token
@@ -164,5 +197,5 @@ app.get('/api/profile', authenticateToken, (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on exp:${port}`);
 });

@@ -8,7 +8,8 @@ import Login from './components/Login';
 import SignupForm from './components/Signup';
 import Home from './components/Home';
 import Logout from './components/Logout';
-import Profile from './components/Profile'; // Import Profile component
+import Profile from './components/Profile';
+import MesNotes from './components/MesNotes';
 
 const Drawer = createDrawerNavigator();
 
@@ -99,6 +100,17 @@ const App = () => {
                 title: 'Home',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="home" color={color} size={20} />
+                ),
+              }}
+            />
+            <Drawer.Screen 
+              name="MesNotes"
+              component={MesNotes}
+              options={{
+                title: 'Mes Notes',
+                drawerIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="notebook" color={color} size={20} />
+                  
                 ),
               }}
             />

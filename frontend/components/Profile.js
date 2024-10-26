@@ -10,7 +10,7 @@ const Profile = ({ setIsLoggedIn }) => {
         const fetchProfile = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
-                const response = await fetch('http://192.168.158.100:5000/api/profile', {
+                const response = await fetch('http://172.16.27.219:3000/api/profile', {
                     headers: {
                         Authorization: `Bearer ${token}`, // Pass the token in the header
                     },
