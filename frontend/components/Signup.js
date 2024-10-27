@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+// Signup.js
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
-
 
 const { width } = Dimensions.get('window');
 
@@ -14,23 +14,31 @@ const SignupForm = ({ navigation }) => {
 
     const pulseAnim = new Animated.Value(1);
 
-    Animated.loop(
-        Animated.sequence([
-            Animated.timing(pulseAnim, { toValue: 1.8, duration: 1000, useNativeDriver: true }),
-            Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-        ])
-    ).start();
+    useEffect(() => {
+        const animationLoop = Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, { toValue: 1.8, duration: 1000, useNativeDriver: true }),
+                Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+            ])
+        );
+        animationLoop.start();
+        return () => animationLoop.stop();
+    }, [pulseAnim]);
 
     const handleSignup = () => {
         if (password !== confirmPassword) {
             Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
             return;
         }
+        if (!firstname || !lastname || !email || !password) {
+            Alert.alert('Erreur', 'Tous les champs doivent être remplis.');
+            return;
+        }
 
         const data = { firstname, lastname, email, password };
 
         // Envoie des données à l'API backend
-        fetch('http://172.16.27.219:3000/api/signup', {
+        fetch('http://192.168.158.100:5000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -41,6 +49,7 @@ const SignupForm = ({ navigation }) => {
             .then(data => {
                 if (data.success) {
                     Alert.alert('Succès', 'Inscription réussie!');
+                    navigation.navigate('Login'); // Rediriger vers la page de connexion
                 } else {
                     Alert.alert('Erreur', data.message);
                 }
@@ -67,6 +76,7 @@ const SignupForm = ({ navigation }) => {
                                 style={styles.input}
                                 value={firstname}
                                 onChangeText={setFirstname}
+                                placeholder=" "
                                 onFocus={() => setFocusedInput({ firstname: true })}
                                 onBlur={() => setFocusedInput({ firstname: false })}
                             />
@@ -79,6 +89,7 @@ const SignupForm = ({ navigation }) => {
                                 style={styles.input}
                                 value={lastname}
                                 onChangeText={setLastname}
+                                placeholder=" "
                                 onFocus={() => setFocusedInput({ lastname: true })}
                                 onBlur={() => setFocusedInput({ lastname: false })}
                             />
@@ -93,6 +104,7 @@ const SignupForm = ({ navigation }) => {
                             style={styles.input}
                             value={email}
                             onChangeText={setEmail}
+                            placeholder=" "
                             keyboardType="email-address"
                             onFocus={() => setFocusedInput({ email: true })}
                             onBlur={() => setFocusedInput({ email: false })}
@@ -107,6 +119,7 @@ const SignupForm = ({ navigation }) => {
                             value={password}
                             onChangeText={setPassword}
                             secureTextEntry
+                            placeholder=" "
                             onFocus={() => setFocusedInput({ password: true })}
                             onBlur={() => setFocusedInput({ password: false })}
                         />
@@ -120,6 +133,7 @@ const SignupForm = ({ navigation }) => {
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
                             secureTextEntry
+                            placeholder=" "
                             onFocus={() => setFocusedInput({ confirmPassword: true })}
                             onBlur={() => setFocusedInput({ confirmPassword: false })}
                         />

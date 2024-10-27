@@ -9,7 +9,7 @@ const port = 3000;
 
 // Middleware
 app.use(cors({
-    origin: 'http://172.16.27.219:8081', // Adjust this to match your React Native development server
+    origin: 'http://192.168.158.100:8082', // Adjust this to match your React Native development server
     credentials: true, // Enable credentials for session handling
 }));
 app.use(bodyParser.json());
@@ -26,7 +26,7 @@ app.use(session({
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'mahmoud bh',
+    password: '2d4b88bg',
     database: 'gestion_etudiant'
 });
 
@@ -171,31 +171,20 @@ app.post('/api/notes', authenticateToken, (req, res) => {
 
 
 
-// Profile endpoint
-app.get('/api/profile', authenticateToken, (req, res) => {
-    const userId = req.user.id; // Get the user ID from the token
+// Route to update profile
+app.put('/api/profile', authenticateToken, (req, res) => {
+    const { firstname, lastname, email } = req.body;
+    const userId = req.user.id; // Extracted from the JWT
 
-    // Query to get user data from the database
-    const sql = 'SELECT id, firstname, lastname, email FROM users WHERE id = ?';
-    db.query(sql, [userId], (err, results) => {
+    const sql = 'UPDATE users SET firstname = ?, lastname = ? WHERE id = ?';
+    db.query(sql, [firstname, lastname, userId], (err, result) => {
         if (err) {
-            console.error('Database error:', err); // Log the error for debugging
-            return res.status(500).json({ success: false, message: 'Error retrieving profile.' });
+            return res.status(500).json({ success: false, message: 'Error updating profile.' });
         }
-
-        if (results.length === 0) {
-            return res.status(404).json({ success: false, message: 'User not found.' });
-        }
-
-        // Return the user profile information, excluding the password
-        const userProfile = results[0]; // Get the first user from results
-        res.json(userProfile);
+        return res.status(200).json({ success: true, message: 'Profile updated successfully!' });
     });
 });
 
-
-
-// Start the server
 app.listen(port, () => {
     console.log(`Server running on exp:${port}`);
 });
