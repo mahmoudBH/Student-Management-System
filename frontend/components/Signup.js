@@ -1,6 +1,6 @@
-// Signup.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 const { width } = Dimensions.get('window');
 
@@ -10,8 +10,8 @@ const SignupForm = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [selectedClass, setSelectedClass] = useState(''); // State for the class
     const [focusedInput, setFocusedInput] = useState({});
-
     const pulseAnim = new Animated.Value(1);
 
     useEffect(() => {
@@ -30,15 +30,15 @@ const SignupForm = ({ navigation }) => {
             Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
             return;
         }
-        if (!firstname || !lastname || !email || !password) {
+        if (!firstname || !lastname || !email || !password || !selectedClass) {
             Alert.alert('Erreur', 'Tous les champs doivent être remplis.');
             return;
         }
 
-        const data = { firstname, lastname, email, password };
+        const data = { firstname, lastname, email, password, class: selectedClass };
 
         // Envoie des données à l'API backend
-        fetch('http://192.168.158.100:5000/api/signup', {
+        fetch('http://192.168.145.123:3000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -113,6 +113,29 @@ const SignupForm = ({ navigation }) => {
                             Email
                         </Text>
                     </View>
+
+                    {/* Class Picker */}
+                    <View style={styles.inputContainer}>
+                        <Picker
+                            selectedValue={selectedClass}
+                            style={[styles.input, { height: 50 }]} // Adjust height for the picker
+                            onValueChange={(itemValue) => setSelectedClass(itemValue)}
+                        >
+                            <Picker.Item label="Select Class" value="" />
+                            <Picker.Item label="TI11" value="TI11" />
+                            <Picker.Item label="TI12" value="TI12" />
+                            <Picker.Item label="TI13" value="TI13" />
+                            <Picker.Item label="TI14" value="TI14" />
+                            <Picker.Item label="DSI21" value="DSI21" />
+                            <Picker.Item label="DSI22" value="DSI22" />
+                            <Picker.Item label="DSI31" value="DSI31" />
+                            <Picker.Item label="DSI32" value="DSI32" />
+                        </Picker>
+                        <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
+                            Class
+                        </Text>
+                    </View>
+
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
@@ -235,33 +258,31 @@ const styles = StyleSheet.create({
         top: 18,
         color: 'grey',
         fontSize: 14,
-        transition: 'top 0.2s, fontSize 0.2s', // CSS transition for smooth animation
+        transition: 'all 0.2s ease',
     },
     labelFocused: {
-        top: 4,
+        top: 0,
         fontSize: 12,
-        fontWeight: '600',
         color: 'royalblue',
     },
     submit: {
         backgroundColor: 'royalblue',
-        padding: 12,
+        padding: 15,
         borderRadius: 10,
         alignItems: 'center',
-        marginTop: 10,
     },
     submitText: {
         color: '#fff',
         fontSize: 16,
+        fontWeight: '600',
     },
     signin: {
-        color: 'rgba(88, 87, 87, 0.822)',
         textAlign: 'center',
-        marginTop: 10,
+        marginTop: 15,
     },
     signinLink: {
         color: 'royalblue',
-        textDecorationLine: 'underline',
+        fontWeight: '600',
     },
 });
 

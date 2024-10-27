@@ -10,6 +10,8 @@ import Home from './components/Home';
 import Logout from './components/Logout';
 import Profile from './components/Profile';
 import MesNotes from './components/MesNotes';
+import MesCours from './components/MesCours'; // Import the MesCours component
+
 
 const Drawer = createDrawerNavigator();
 
@@ -111,6 +113,16 @@ const App = () => {
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="notebook" color={color} size={20} />
                   
+                ),
+              }}
+            />
+            <Drawer.Screen
+              name="MesCours"
+              component={MesCours}
+              options={{
+                title: 'Mes Cours',
+                drawerIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="book-open" color={color} size={20} />
                 ),
               }}
             />
