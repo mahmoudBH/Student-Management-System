@@ -1,0 +1,62 @@
+/* Styles pour le composant AddStudentForm */
+form {
+  max-width: 500px; /* Largeur maximale du formulaire */
+  margin: 180px auto; /* Centre le formulaire et réduit l'espacement */
+  padding: 25px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  color: #4a90e2; /* Harmonisation avec la couleur de titre */
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #4a90e2; /* Couleur de surbrillance */
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #4a90e2;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #357abd; /* Couleur plus foncée au survol */
+}
+
+p {
+  font-size: 1rem;
+  text-align: center;
+  color: #333333;
+  margin-top: 15px;
+}
