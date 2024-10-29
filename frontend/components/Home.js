@@ -15,7 +15,7 @@ const Home = () => {
           throw new Error('No token found in storage.');
         }
     
-        const response = await fetch('http://192.168.145.123:3000/api/session', {
+        const response = await fetch('http://192.168.90.123:3000/api/session', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`, // Send the token in the Authorization header

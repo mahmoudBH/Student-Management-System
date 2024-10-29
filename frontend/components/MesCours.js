@@ -1,7 +1,7 @@
-// MesCours.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 
 const MesCours = () => {
     const [cours, setCours] = useState([]);
@@ -10,8 +10,7 @@ const MesCours = () => {
         const fetchCours = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
-
-                const response = await fetch('http://192.168.145.123:3000/api/mescours', {
+                const response = await fetch('http://192.168.90.123:3000/api/mescours', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -33,11 +32,33 @@ const MesCours = () => {
         fetchCours();
     }, []);
 
+    const handleDownload = async (fileUrl) => {
+        // Vérifiez si l'URL est définie et commence par http ou https
+        if (!fileUrl || !/^https?:\/\//.test(fileUrl)) {
+            Alert.alert('Error', 'Invalid file URL. Please check the URL and try again.');
+            return;
+        }
+
+        try {
+            const uri = `${FileSystem.documentDirectory}${fileUrl.split('/').pop()}`; // Création du chemin local pour le fichier
+            const download = FileSystem.createDownloadResumable(fileUrl, uri);
+            const { uri: localUri } = await download.downloadAsync(); // Lancement du téléchargement
+            console.log('Downloaded to:', localUri);
+            Alert.alert('Success', 'Course downloaded successfully!', [{ text: 'OK' }]);
+        } catch (error) {
+            console.error('Download error:', error);
+            Alert.alert('Error', 'An error occurred while downloading the course.');
+        }
+    };
+
     const renderCourse = ({ item }) => (
-        <View style={styles.courseItem}>
-            <Text style={styles.courseTitle}>{item.title}</Text>
-            <Text style={styles.courseDescription}>{item.description}</Text>
-        </View>
+        <TouchableOpacity onPress={() => handleDownload(`http://192.168.90.123:3000/${item.pdf_path}`)}>
+            <View style={styles.courseItem}>
+                <Text style={styles.courseTitle}>{item.matiere}</Text>
+                <Text style={styles.courseDescription}>{item.classe}</Text>
+                <Text style={styles.courseDescription}>{new Date(item.created_at).toLocaleDateString()}</Text>
+            </View>
+        </TouchableOpacity>
     );
 
     return (

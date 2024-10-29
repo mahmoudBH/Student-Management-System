@@ -13,7 +13,7 @@ const Profile = ({ setIsLoggedIn }) => {
         const fetchProfile = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
-                const response = await fetch('http://192.168.145.123:3000/api/profile', {
+                const response = await fetch('http://192.168.90.123:3000/api/profile', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -41,7 +41,7 @@ const Profile = ({ setIsLoggedIn }) => {
     const updateProfile = async () => {
         const token = await AsyncStorage.getItem('token');
         try {
-            const response = await fetch('http://192.168.1.136:3000/api/profile', {
+            const response = await fetch('http://192.168.90.123:3000/api/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
