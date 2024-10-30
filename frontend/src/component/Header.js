@@ -38,18 +38,17 @@ const Header = () => {
         <img src="/images/user.jpg" alt="User Profile" className="header-user-icon" />
         <div className="dropdown-menu">
           <ul>
-          <li>
-            <div
-              onClick={handleProfileClick}
-              role="button"
-              tabIndex="0"
-              onKeyPress={(e) => e.key === 'Enter' && handleProfileClick()}
-            >
-              <img src="/icons/user.svg" alt="Profile" />
-              <span>Profile</span>
-            </div>
-          </li>
-
+            <li>
+              <div
+                onClick={handleProfileClick}
+                role="button"
+                tabIndex="0"
+                onKeyPress={(e) => e.key === 'Enter' && handleProfileClick()}
+              >
+                <img src="/icons/user.svg" alt="Profile" />
+                <span>Profile</span>
+              </div>
+            </li>
             <li><img src="/icons/settings-sliders.svg" alt="Settings" />Settings</li>
             <li onClick={handleLogout}><img src="/icons/sign-out-alt.svg" alt="Logout" />Logout</li>
           </ul>
@@ -62,6 +61,7 @@ const Header = () => {
           <li><a href="/add-student"><img src="/icons/add-document.svg" alt="Add Note" /><span>Add Note</span></a></li>
           <li><a href="/edit-note"><img src="/icons/edit.svg" alt="Edit Notes" /><span>Edit Notes</span></a></li>
           <li><a href="/add-course"><img src="/icons/add.svg" alt="Add Course" /><span>Add Course</span></a></li>
+          <li><a href="/manage-student"><img src="/icons/manage.svg" alt="Manage Student" /><span>Gérer Etudiant</span></a></li>
         </ul>
       </div>
     </header>

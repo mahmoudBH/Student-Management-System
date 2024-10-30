@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Signup from './component/authentification/Signup';
@@ -8,6 +7,7 @@ import EditNoteForm from './component/pages/EditNoteForm/EditNoteForm';
 import AddStudentForm from './component/pages/AddStudentForm/AddStudentForm';
 import AddCourseForm from './component/pages/AddCourseForm/AddCourseForm';
 import Profile from './component/pages/Profile/Profile';
+import ManageStudent from './component/pages/ManageStudent/ManageStudent';
 
 function App() {
   return (
@@ -20,7 +20,8 @@ function App() {
           <Route path="/add-student" element={<AddStudentForm />} /> {/* Page pour ajouter un étudiant */}
           <Route path="/edit-note" element={<EditNoteForm />} /> {/* Page pour modifier la note */}
           <Route path="/add-course" element={<AddCourseForm />} /> {/* Page pour ajouter un cours en PDF */}
-          <Route path="/profile" element={<Profile />} /> 
+          <Route path="/profile" element={<Profile />} />       {/* Page de profil */}
+          <Route path="/manage-student" element={<ManageStudent />} /> {/* Page pour gérer les étudiants */}
         </Routes>
       </div>
     </Router>

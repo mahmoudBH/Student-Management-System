@@ -1,0 +1,120 @@
+/* ManageStudent.css */
+
+.manage-student-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    font-size: 2rem;
+    color: #343a40;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .student-list {
+    background-color: #ffffff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    max-height: 700px;
+    overflow-y: auto;
+  }
+  
+  .student-list h3 {
+    font-size: 1.5rem;
+    color: #007bff;
+  }
+  
+  .student-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .student-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .student-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .student-list li button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .student-list li button:hover {
+    background-color: #0056b3;
+  }
+  
+  .edit-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .edit-form h3 {
+    font-size: 1.8rem;
+    color: #007bff;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .edit-form label {
+    display: block;
+    font-weight: bold;
+    color: #495057;
+    margin-top: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .edit-form input[type="text"],
+  .edit-form input[type="email"],
+  .edit-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    font-size: 1rem;
+    color: #495057;
+  }
+  
+  .edit-form input:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+  }
+  
+  .edit-form button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+  
+  .edit-form button:hover {
+    background-color: #0056b3;
+  }

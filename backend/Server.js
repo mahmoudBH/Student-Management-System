@@ -35,7 +35,7 @@ app.use(session({
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'mahmoud bh',
+  password: 'root',
   database: 'gestion_etudiant',
 });
 
@@ -89,21 +89,23 @@ app.get('/api/check-session', (req, res) => {
 });
 
 // Admin sign-up route
+// Admin sign-up route
 app.post('/api/admin/signup', (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, mobileNumber } = req.body;
 
   const queryCheck = 'SELECT * FROM admin WHERE email = ?';
   db.query(queryCheck, [email], (err, results) => {
     if (err) return res.status(500).json({ error: 'Erreur du serveur' });
     if (results.length > 0) return res.status(400).json({ error: 'L\'email existe déjà' });
 
-    const queryInsert = 'INSERT INTO admin (name, email, password) VALUES (?, ?, ?)';
-    db.query(queryInsert, [name, email, password], (err, results) => {
+    const queryInsert = 'INSERT INTO admin (name, email, password, mobile_number) VALUES (?, ?, ?, ?)';
+    db.query(queryInsert, [name, email, password, mobileNumber], (err, results) => {
       if (err) return res.status(500).json({ error: 'Erreur du serveur' });
       return res.status(201).json({ message: 'Admin créé avec succès' });
     });
   });
 });
+
 
 // Admin login route
 app.post('/api/admin/login', (req, res) => {
@@ -258,7 +260,7 @@ app.get('/api/cours/:id/pdf', (req, res) => {
 app.get('/api/user', (req, res) => {
   const userId = req.session.user.id; // Assuming the user ID is stored in the session
 
-  db.query('SELECT id, name, email FROM admin WHERE id = ?', [userId], (err, results) => {
+  db.query('SELECT id, name, email , mobile_number FROM admin WHERE id = ?', [userId], (err, results) => {
     if (err) {
       return res.status(500).json({ message: 'Database error' });
     }
@@ -274,12 +276,12 @@ app.get('/api/user', (req, res) => {
 // Route pour mettre à jour les données de l'utilisateur
 app.put('/api/user/:id', (req, res) => {
   const { id } = req.params;
-  const { name, email } = req.body;
+  const { name, email, mobile_number } = req.body;
 
-  // Database query to update the user's name and email
+  // Database query to update the user's name, email, and mobile number
   db.query(
-    'UPDATE admin SET name = ?, email = ? WHERE id = ?',
-    [name, email, id],
+    'UPDATE admin SET name = ?, email = ?, mobile_number = ? WHERE id = ?',
+    [name, email, mobile_number, id],
     (err, results) => {
       if (err) {
         return res.status(500).json({ message: 'Erreur de mise à jour des données' });
@@ -291,7 +293,6 @@ app.put('/api/user/:id', (req, res) => {
     }
   );
 });
-
 
 
 // Update user password
@@ -325,6 +326,45 @@ app.put('/api/user/:id/password', async (req, res) => {
 
       res.status(200).json({ message: 'Mot de passe mis à jour avec succès.' });
     });
+  });
+});
+// Get all students
+app.get('/api/students', (req, res) => {
+  const sql = 'SELECT * FROM users';
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+// Update a student's details
+app.put('/api/students/:id', (req, res) => {
+  const studentId = req.params.id;
+  const { firstname, lastname, email, password, class: studentClass } = req.body;
+
+  const sql = 'UPDATE users SET firstname = ?, lastname = ?, email = ?, password = ?, class = ? WHERE id = ?';
+  db.query(sql, [firstname, lastname, email, password, studentClass, studentId], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Student updated successfully' });
+  });
+});
+
+
+// Delete a student
+app.delete('/api/students/:id', (req, res) => {
+  const studentId = req.params.id;
+
+  const sql = 'DELETE FROM users WHERE id = ?';
+  db.query(sql, [studentId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    res.json({ message: 'Student deleted successfully' });
   });
 });
 

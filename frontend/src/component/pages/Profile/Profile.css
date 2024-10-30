@@ -1,98 +1,123 @@
 /* Profile.css */
 
-body {
-    font-family: Arial, sans-serif;
-    color: #333;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .Profile-container {
-    width: 80%;
-    max-width: 600px;
-    margin: 125px auto;
+.Profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+.Profile-header {
+  font-size: 2.2rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.Profile-message {
+  color: #e63946;
+  margin-bottom: 15px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.Profile-details {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+}
+
+.Profile-details:hover {
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.Profile-label {
+  font-weight: bold;
+  color: #666;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.Profile-input, .Profile-password-input {
+  width: 100%;
+  padding: 10px 15px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.Profile-input:focus, .Profile-password-input:focus {
+  border-color: #2a9d8f;
+  outline: none;
+  box-shadow: 0 0 8px rgba(42, 157, 143, 0.3);
+}
+
+.Profile-button, .Profile-secondary-button {
+  padding: 10px 20px;
+  margin-top: 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.Profile-button {
+  background-color: #2a9d8f;
+}
+
+.Profile-button:hover {
+  background-color: #21867a;
+  transform: translateY(-2px);
+}
+
+.Profile-secondary-button {
+  background-color: #b5b5b5;
+}
+
+.Profile-secondary-button:hover {
+  background-color: #9d9d9d;
+  transform: translateY(-2px);
+}
+
+.Profile-section-header {
+  font-size: 1.8rem;
+  color: #333;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.Profile-password-section {
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 600px) {
+  .Profile-details {
+    width: 90%;
     padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
+
   .Profile-header {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    color: #007bff;
+    font-size: 1.8rem;
   }
-  
-  .Profile-message {
-    color: #007bff;
-    text-align: center;
+
+  .Profile-button, .Profile-secondary-button {
+    width: 100%;
     margin-top: 10px;
   }
-  
-  .Profile-details, .Profile-password-section {
-    margin: 20px 0;
-  }
-  
-  .Profile-label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  .Profile-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-  
-  .Profile-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-right: 10px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .Profile-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .Profile-secondary-button {
-    background-color: #f1f1f1;
-    color: #333;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .Profile-secondary-button:hover {
-    background-color: #ddd;
-  }
-  
-  .Profile-section-header {
-    font-size: 20px;
-    color: #007bff;
-    margin-top: 30px;
-    text-align: center;
-  }
-  
-  .Profile-password-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-  
+}

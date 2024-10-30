@@ -7,7 +7,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formValues, setFormValues] = useState({ name: '', email: '' });
+  const [formValues, setFormValues] = useState({ name: '', email: '', mobile_number: '' });
   const [passwordValues, setPasswordValues] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [isPasswordEditing, setIsPasswordEditing] = useState(false);
   const [message, setMessage] = useState('');
@@ -31,7 +31,7 @@ const Profile = () => {
           if (userResponse.ok) {
             const userData = await userResponse.json();
             setUser(userData);
-            setFormValues({ name: userData.name, email: userData.email });
+            setFormValues({ name: userData.name, email: userData.email, mobile_number: userData.mobile_number });
           } else {
             setMessage('Erreur lors de la récupération des données de l\'utilisateur');
           }
@@ -63,6 +63,7 @@ const Profile = () => {
         body: JSON.stringify({
           name: formValues.name,
           email: formValues.email,
+          mobile_number: formValues.mobile_number,
         }),
       });
 
@@ -131,7 +132,6 @@ const Profile = () => {
       {message && <p className="Profile-message">{message}</p>}
       {user ? (
         <div className="Profile-details">
-          <p><strong>ID:</strong> {user.id}</p>
           <div>
             <strong className="Profile-label">Nom:</strong>
             {isEditing ? (
@@ -158,6 +158,20 @@ const Profile = () => {
               />
             ) : (
               <span>{user.email}</span>
+            )}
+          </div>
+          <div>
+            <strong className="Profile-label">Numéro de téléphone:</strong>
+            {isEditing ? (
+              <input
+                type="text"
+                name="mobile_number"
+                className="Profile-input"
+                value={formValues.mobile_number}
+                onChange={handleChange}
+              />
+            ) : (
+              <span>{user.mobile_number}</span>
             )}
           </div>
           {isEditing ? (
