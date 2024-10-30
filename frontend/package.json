@@ -12,29 +12,20 @@
     "@expo/vector-icons": "^14.0.4",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/masked-view": "^0.1.11",
-<<<<<<< HEAD
-=======
     "@react-native-picker/picker": "^2.9.0",
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
     "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
     "axios": "^1.7.7",
     "expo": "~51.0.28",
-<<<<<<< HEAD
-=======
     "expo-file-system": "^17.0.1",
     "expo-permissions": "^14.4.0",
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
     "react-native": "^0.74.5",
     "react-native-gesture-handler": "^2.20.0",
     "react-native-image-picker": "^7.1.2",
-<<<<<<< HEAD
-=======
     "react-native-pdf": "^6.7.5",
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
     "react-native-reanimated": "~3.10.1",
     "react-native-safe-area-context": "^4.11.1",
     "react-native-screens": "^3.34.0",

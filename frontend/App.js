@@ -10,11 +10,9 @@ import Home from './components/Home';
 import Logout from './components/Logout';
 import Profile from './components/Profile';
 import MesNotes from './components/MesNotes';
-<<<<<<< HEAD
-=======
-import MesCours from './components/MesCours'; // Import the MesCours component
+import MesCours from './components/MesCours';
+import Contact from './components/Contact';
 
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
 
 const Drawer = createDrawerNavigator();
 
@@ -119,8 +117,6 @@ const App = () => {
                 ),
               }}
             />
-<<<<<<< HEAD
-=======
             <Drawer.Screen
               name="MesCours"
               component={MesCours}
@@ -131,7 +127,6 @@ const App = () => {
                 ),
               }}
             />
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
             <Drawer.Screen 
               name="Profile" 
               options={{ 
@@ -143,6 +138,16 @@ const App = () => {
             >
               {(props) => <Profile {...props} setIsLoggedIn={setIsLoggedIn} />}
             </Drawer.Screen>
+            <Drawer.Screen
+              name="Contact"
+              component={Contact}
+              options={{
+                title: 'Contact',
+                drawerIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="account-box" color={color} size={20} />
+                ),
+              }}
+            />
             <Drawer.Screen 
               name="Logout" 
               options={{ 

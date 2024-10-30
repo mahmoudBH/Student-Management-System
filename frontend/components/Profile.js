@@ -1,207 +1,183 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { launchImageLibrary } from 'react-native-image-picker'; // Import image picker
 
-const Profile = ({ setIsLoggedIn }) => {
-    const [profile, setProfile] = useState({ firstname: '', lastname: '', email: '', password: '', profileImage: '' });
-    const [loading, setLoading] = useState(true);
-    const [isEditing, setIsEditing] = useState(false);
+const Profile = () => {
+  const [user, setUser] = useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+  });
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-<<<<<<< HEAD
-                const response = await fetch('http://192.168.1.135:3000/api/profile', {
-=======
-                const response = await fetch('http://192.168.90.123:3000/api/profile', {
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [loading, setLoading] = useState(true);
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        setIsLoggedIn(false);
-                    }
-                    throw new Error('Profile not found.');
-                }
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch('http://192.168.43.100:3000/api/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-                const data = await response.json();
-                setProfile(data);
-            } catch (error) {
-                console.error('Profile Error:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+      console.log('Response Status:', response.status);
+      const data = await response.json();
+      console.log('Response Data:', data); // Log the data
 
-        fetchProfile();
-    }, [setIsLoggedIn]);
+      if (response.ok && data.success) {
+        setUser(data.data); // Accessing data from the response object
+      } else {
+        console.log('Error fetching user data:', response.status, data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const updateProfile = async () => {
-        const token = await AsyncStorage.getItem('token');
-        try {
-<<<<<<< HEAD
-            const response = await fetch('http://192.168.137.123:5000/api/profile', {
-=======
-            const response = await fetch('http://192.168.90.123:3000/api/profile', {
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(profile),
-            });
+  const handleUpdate = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch('http://192.168.43.100:3000/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
 
-            const data = await response.json();
-            if (data.success) {
-                Alert.alert('Succès', 'Profil mis à jour avec succès');
-                setIsEditing(false); // Désactiver l'édition après succès
-            } else {
-                Alert.alert('Erreur', data.message);
-            }
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour du profil:', error);
-            Alert.alert('Erreur', 'Erreur lors de la mise à jour du profil');
-        }
-    };
+      if (response.ok) {
+        Alert.alert('Success', 'Profile updated successfully!');
+      } else {
+        console.log('Error updating profile:', response.status);
+        Alert.alert('Error', 'Failed to update profile.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'An error occurred while updating your profile.');
+    }
+  };
 
-    const selectProfileImage = () => {
-        launchImageLibrary({}, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else {
-                const uri = response.assets[0].uri;
-                setProfile({ ...profile, profileImage: uri });
-            }
-        });
-    };
-
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#4CAF50" />
-                <Text style={styles.loadingText}>Loading Profile...</Text>
-            </View>
-        );
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Error', 'New password and confirm password do not match.');
+      return;
     }
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={selectProfileImage}>
-                    {profile.profileImage ? (
-                        <Image source={{ uri: profile.profileImage }} style={styles.profileImage} />
-                    ) : (
-                        <Icon name="account-circle" size={80} color="#4CAF50" />
-                    )}
-                </TouchableOpacity>
-                <Text style={styles.title}>
-                    {isEditing ? 'Edit Profile' : `${profile.firstname} ${profile.lastname}`}
-                </Text>
-            </View>
-            <View style={styles.detailsContainer}>
-                <Text style={styles.label}>Firstname:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={profile.firstname}
-                    editable={isEditing}
-                    onChangeText={(text) => setProfile({ ...profile, firstname: text })}
-                />
-                <Text style={styles.label}>Lastname:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={profile.lastname}
-                    editable={isEditing}
-                    onChangeText={(text) => setProfile({ ...profile, lastname: text })}
-                />
-                <Text style={styles.label}>Email:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={profile.email}
-                    editable={isEditing}
-                    onChangeText={(text) => setProfile({ ...profile, email: text })}
-                />
-                <Text style={styles.label}>Password (optional):</Text>
-                <TextInput
-                    style={styles.input}
-                    value={profile.password}
-                    editable={isEditing}
-                    onChangeText={(text) => setProfile({ ...profile, password: text })}
-                    secureTextEntry
-                    placeholder="Enter new password"
-                />
-            </View>
-            {isEditing ? (
-                <Button title="Save Changes" onPress={updateProfile} />
-            ) : (
-                <Button title="Edit Profile" onPress={() => setIsEditing(true)} />
-            )}
-        </View>
-    );
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch('http://192.168.43.100:3000/api/change-password', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', 'Password changed successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        console.log('Error changing password:', response.status);
+        Alert.alert('Error', 'Failed to change password. Please check your current password.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'An error occurred while changing your password.');
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#6200ee" />; // Show loading spinner
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Profile</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="First Name"
+        value={user.firstname}
+        onChangeText={(text) => setUser({ ...user, firstname: text })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        value={user.lastname}
+        onChangeText={(text) => setUser({ ...user, lastname: text })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={user.email}
+        onChangeText={(text) => setUser({ ...user, email: text })}
+        keyboardType="email-address"
+      />
+      <Button title="Update Profile" onPress={handleUpdate} />
+
+      {/* Password Change Section */}
+      <Text style={styles.header}>Change Password</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Current Password"
+        value={currentPassword}
+        onChangeText={setCurrentPassword}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="New Password"
+        value={newPassword}
+        onChangeText={setNewPassword}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm New Password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+      />
+      <Button title="Change Password" onPress={handleChangePassword} />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#f4f4f4',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-        marginLeft: 15,
-    },
-    profileImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-    },
-    detailsContainer: {
-        backgroundColor: '#fff',
-        padding: 15,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
-    },
-    label: {
-        fontSize: 16,
-        color: '#333',
-        marginBottom: 5,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 15,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 18,
-        color: '#4CAF50',
-    },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#6200ee',
+  },
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+  },
 });
 
 export default Profile;

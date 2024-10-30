@@ -10,7 +10,7 @@ const MesCours = () => {
         const fetchCours = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
-                const response = await fetch('http://192.168.90.123:3000/api/mescours', {
+                const response = await fetch('http://192.168.43.100:3000/api/mescours', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -33,16 +33,15 @@ const MesCours = () => {
     }, []);
 
     const handleDownload = async (fileUrl) => {
-        // Vérifiez si l'URL est définie et commence par http ou https
         if (!fileUrl || !/^https?:\/\//.test(fileUrl)) {
             Alert.alert('Error', 'Invalid file URL. Please check the URL and try again.');
             return;
         }
 
         try {
-            const uri = `${FileSystem.documentDirectory}${fileUrl.split('/').pop()}`; // Création du chemin local pour le fichier
+            const uri = `${FileSystem.documentDirectory}${fileUrl.split('/').pop()}`;
             const download = FileSystem.createDownloadResumable(fileUrl, uri);
-            const { uri: localUri } = await download.downloadAsync(); // Lancement du téléchargement
+            const { uri: localUri } = await download.downloadAsync();
             console.log('Downloaded to:', localUri);
             Alert.alert('Success', 'Course downloaded successfully!', [{ text: 'OK' }]);
         } catch (error) {
@@ -52,18 +51,18 @@ const MesCours = () => {
     };
 
     const renderCourse = ({ item }) => (
-        <TouchableOpacity onPress={() => handleDownload(`http://192.168.90.123:3000/${item.pdf_path}`)}>
+        <TouchableOpacity onPress={() => handleDownload(`http://192.168.43.100:3000/${item.pdf_path}`)}>
             <View style={styles.courseItem}>
                 <Text style={styles.courseTitle}>{item.matiere}</Text>
-                <Text style={styles.courseDescription}>{item.classe}</Text>
-                <Text style={styles.courseDescription}>{new Date(item.created_at).toLocaleDateString()}</Text>
+                <Text style={styles.courseDescription}>Class: {item.classe}</Text>
+                <Text style={styles.courseDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
             </View>
         </TouchableOpacity>
     );
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Mes Cours</Text>
+            <Text style={styles.header}>My Courses</Text>
             <FlatList
                 data={cours}
                 keyExtractor={(item) => item.id.toString()}
@@ -77,28 +76,43 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#f7f9fc',
     },
     header: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
+        color: '#1e305f',
+        alignSelf: 'center',
         marginBottom: 20,
     },
     courseItem: {
-        padding: 15,
-        marginVertical: 8,
-        backgroundColor: '#f0f8ff',
-        borderRadius: 8,
+        padding: 18,
+        marginVertical: 10,
+        backgroundColor: '#ffffff',
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#e0e6ef',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 3,
     },
     courseTitle: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
+        color: '#1e305f',
     },
     courseDescription: {
         fontSize: 16,
-        color: '#555',
+        color: '#64748b',
+        marginVertical: 4,
+    },
+    courseDate: {
+        fontSize: 14,
+        color: '#9aa5b1',
+        marginTop: 6,
+        fontStyle: 'italic',
     },
 });
 

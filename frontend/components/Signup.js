@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-// Signup.js
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
-=======
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
 
 const { width } = Dimensions.get('window');
 
@@ -16,13 +10,8 @@ const SignupForm = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-<<<<<<< HEAD
+    const [selectedClass, setSelectedClass] = useState('');
     const [focusedInput, setFocusedInput] = useState({});
-
-=======
-    const [selectedClass, setSelectedClass] = useState(''); // State for the class
-    const [focusedInput, setFocusedInput] = useState({});
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
     const pulseAnim = new Animated.Value(1);
 
     useEffect(() => {
@@ -41,26 +30,14 @@ const SignupForm = ({ navigation }) => {
             Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
             return;
         }
-<<<<<<< HEAD
-        if (!firstname || !lastname || !email || !password) {
-=======
         if (!firstname || !lastname || !email || !password || !selectedClass) {
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
             Alert.alert('Erreur', 'Tous les champs doivent être remplis.');
             return;
         }
 
-<<<<<<< HEAD
-        const data = { firstname, lastname, email, password };
-
-        // Envoie des données à l'API backend
-        fetch('http://192.168.1.135:3000/api/signup', {
-=======
         const data = { firstname, lastname, email, password, class: selectedClass };
 
-        // Envoie des données à l'API backend
-        fetch('http://192.168.90.123:3000/api/signup', {
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
+        fetch('http://192.168.43.100:3000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -71,7 +48,7 @@ const SignupForm = ({ navigation }) => {
             .then(data => {
                 if (data.success) {
                     Alert.alert('Succès', 'Inscription réussie!');
-                    navigation.navigate('Login'); // Rediriger vers la page de connexion
+                    navigation.navigate('Login');
                 } else {
                     Alert.alert('Erreur', data.message);
                 }
@@ -135,15 +112,17 @@ const SignupForm = ({ navigation }) => {
                             Email
                         </Text>
                     </View>
-<<<<<<< HEAD
-=======
 
-                    {/* Class Picker */}
+                    {/* Enhanced Class Picker */}
                     <View style={styles.inputContainer}>
+                        <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
+                            Class
+                        </Text>
                         <Picker
                             selectedValue={selectedClass}
-                            style={[styles.input, { height: 50 }]} // Adjust height for the picker
+                            style={styles.picker}
                             onValueChange={(itemValue) => setSelectedClass(itemValue)}
+                             // Placeholder for Picker
                         >
                             <Picker.Item label="Select Class" value="" />
                             <Picker.Item label="TI11" value="TI11" />
@@ -155,12 +134,8 @@ const SignupForm = ({ navigation }) => {
                             <Picker.Item label="DSI31" value="DSI31" />
                             <Picker.Item label="DSI32" value="DSI32" />
                         </Picker>
-                        <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
-                            Class
-                        </Text>
                     </View>
 
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
@@ -269,73 +244,60 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        padding: 10,
+        padding: 15, // Increased padding for comfort
         paddingTop: 20,
         borderWidth: 1,
         borderColor: 'rgba(105, 105, 105, 0.397)',
         borderRadius: 10,
         fontSize: 16,
         color: 'black',
+        backgroundColor: '#f9f9f9', // Background color for input
+    },
+    picker: {
+        width: '100%',
+        padding: 15, // Match the input field padding
+        borderWidth: 1,
+        borderColor: 'rgba(105, 105, 105, 0.397)',
+        borderRadius: 10,
+        backgroundColor: '#f9f9f9', // Background color for Picker
     },
     label: {
         position: 'absolute',
-        left: 12,
-        top: 18,
+        left: 15,
+        top: 15,
         color: 'grey',
-        fontSize: 14,
-<<<<<<< HEAD
-        transition: 'top 0.2s, fontSize 0.2s', // CSS transition for smooth animation
-    },
-    labelFocused: {
-        top: 4,
-        fontSize: 12,
+        fontSize: 16,
         fontWeight: '600',
-=======
-        transition: 'all 0.2s ease',
+        transition: '0.2s',
+        backgroundColor: '#fff',
+        paddingHorizontal: 5,
     },
     labelFocused: {
-        top: 0,
-        fontSize: 12,
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
+        top: -5,
+        left: 10,
         color: 'royalblue',
+        fontSize: 12,
     },
     submit: {
         backgroundColor: 'royalblue',
-<<<<<<< HEAD
-        padding: 12,
+        paddingVertical: 15,
         borderRadius: 10,
-        alignItems: 'center',
         marginTop: 10,
-=======
-        padding: 15,
-        borderRadius: 10,
         alignItems: 'center',
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
     },
     submitText: {
-        color: '#fff',
+        color: 'white',
         fontSize: 16,
-<<<<<<< HEAD
-    },
-    signin: {
-        color: 'rgba(88, 87, 87, 0.822)',
-        textAlign: 'center',
-        marginTop: 10,
-    },
-    signinLink: {
-        color: 'royalblue',
-        textDecorationLine: 'underline',
-=======
         fontWeight: '600',
     },
     signin: {
         textAlign: 'center',
         marginTop: 15,
+        color: 'rgba(88, 87, 87, 0.822)',
     },
     signinLink: {
         color: 'royalblue',
         fontWeight: '600',
->>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
     },
 });
 
