@@ -22,11 +22,7 @@ const Login = () => {
       if (response.data.user) {
         // Stocker les données utilisateur dans le local storage
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        // Optionnel : stocker le token JWT si nécessaire
-        // localStorage.setItem('token', response.data.token);
-
         setMessage('Connexion réussie');
-        // Rediriger vers la page d'accueil après une connexion réussie
         window.location.href = '/home'; // Ou utilisez navigate('/home') si vous utilisez react-router
       } else {
         setMessage('Identifiants invalides.'); // Message d'erreur en cas de problème
@@ -42,7 +38,7 @@ const Login = () => {
 
   return (
     <div className="container"> {/* Même conteneur pour centrer le formulaire */}
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="login-form" onSubmit={handleSubmit}> {/* Changement de className ici */}
         <p className="title">Login</p>
         <p className="message">Welcome back! Please enter your credentials.</p>
 

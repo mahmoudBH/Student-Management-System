@@ -79,7 +79,9 @@ const AddStudentForm = () => {
   return (
     <div className="student-form-container">
       <Header /> {/* Ajout du composant Header */}
-      <form onSubmit={handleSubmit}>
+      
+      <form className='form-note' onSubmit={handleSubmit}>
+      <h2 className="form-title">Add Student Note</h2> {/* Title added */}
         <div>
           <label>First Name:</label>
           <input

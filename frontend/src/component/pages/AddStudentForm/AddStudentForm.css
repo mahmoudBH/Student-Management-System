@@ -1,62 +1,118 @@
-/* Styles pour le composant AddStudentForm */
-form {
-  max-width: 500px; /* Largeur maximale du formulaire */
-  margin: 180px auto; /* Centre le formulaire et réduit l'espacement */
-  padding: 25px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Container styling for AddStudentForm */
+.add-student-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px 40px 280px; /* Adjusted for header and sidebar */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
   font-family: Arial, sans-serif;
 }
 
-form div {
-  margin-bottom: 15px;
+/* Form styling */
+.form-note {
+  max-width: 500px;
+  width: 100%;
+  margin: 100px auto;
+  padding: 30px;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  border-radius: 10px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+  transition: transform 0.3s;
 }
 
+.form-note:hover {
+  transform: scale(1.02);
+}
+
+.form-note div {
+  margin-bottom: 20px;
+}
+
+/* Label styling */
 label {
   display: block;
-  font-weight: bold;
-  color: #4a90e2; /* Harmonisation avec la couleur de titre */
-  margin-bottom: 5px;
-  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4a90e2;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
+/* Input and select styling */
 input[type="text"],
 input[type="number"],
 select {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #cccccc;
-  border-radius: 4px;
+  border-radius: 5px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  background: #f5f5f5;
+  color: #333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input:focus,
 select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
   outline: none;
-  border-color: #4a90e2; /* Couleur de surbrillance */
 }
 
+/* Submit button styling */
 button[type="submit"] {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background-color: #4a90e2;
   color: white;
   font-size: 1rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 button[type="submit"]:hover {
-  background-color: #357abd; /* Couleur plus foncée au survol */
+  background-color: #357abd;
+  box-shadow: 0 4px 10px rgba(53, 122, 189, 0.3);
 }
 
+button[type="submit"]:active {
+  transform: translateY(2px);
+}
+
+/* Message styling */
 p {
   font-size: 1rem;
   text-align: center;
-  color: #333333;
   margin-top: 15px;
+  font-weight: bold;
+}
+
+p[style*="color: red"] {
+  color: #e74c3c; /* Red for error message */
+}
+
+p[style*="color: green"] {
+  color: #27ae60; /* Green for success message */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  .add-student-container {
+    padding: 20px;
+  }
+
+  form {
+    padding: 20px;
+    margin-top: 80px; /* Reduces top margin on smaller screens */
+  }
+
+  button[type="submit"] {
+    font-size: 0.9rem;
+  }
 }

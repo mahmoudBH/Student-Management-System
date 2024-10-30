@@ -75,7 +75,7 @@ const AddCourseForm = () => {
   return (
     <div className="course-container">
       <Header /> {/* Include Header component */}
-      <form onSubmit={handleSubmit}>
+      <form className='form-cour' onSubmit={handleSubmit}>
         <h2>Ajouter un Cours</h2>
 
         <div>

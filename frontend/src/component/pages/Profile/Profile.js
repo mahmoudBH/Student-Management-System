@@ -128,10 +128,10 @@ const Profile = () => {
   return (
     <div className="Profile-container">
       <Header />
-      <h2 className="Profile-header">Profil Utilisateur</h2>
       {message && <p className="Profile-message">{message}</p>}
       {user ? (
         <div className="Profile-details">
+          <h2 className="Profile-header">Profil Utilisateur</h2>
           <div>
             <strong className="Profile-label">Nom:</strong>
             {isEditing ? (
@@ -146,6 +146,7 @@ const Profile = () => {
               <span>{user.name}</span>
             )}
           </div>
+          <br></br>
           <div>
             <strong className="Profile-label">Email:</strong>
             {isEditing ? (
@@ -160,6 +161,7 @@ const Profile = () => {
               <span>{user.email}</span>
             )}
           </div>
+          <br></br>
           <div>
             <strong className="Profile-label">Numéro de téléphone:</strong>
             {isEditing ? (

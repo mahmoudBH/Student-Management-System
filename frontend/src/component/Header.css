@@ -203,10 +203,11 @@
 }
 
 .sidebar-menu li {
-  padding: 15px 0;
+  padding: 25px 0;
 }
 
 .sidebar-menu li a {
+  position: fixed;
   color: white;
   text-decoration: none;
   font-size: 20px;

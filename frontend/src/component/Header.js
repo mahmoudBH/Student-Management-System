@@ -61,7 +61,7 @@ const Header = () => {
           <li><a href="/add-student"><img src="/icons/add-document.svg" alt="Add Note" /><span>Add Note</span></a></li>
           <li><a href="/edit-note"><img src="/icons/edit.svg" alt="Edit Notes" /><span>Edit Notes</span></a></li>
           <li><a href="/add-course"><img src="/icons/add.svg" alt="Add Course" /><span>Add Course</span></a></li>
-          <li><a href="/manage-student"><img src="/icons/manage.svg" alt="Manage Student" /><span>Gérer Etudiant</span></a></li>
+          <li><a href="/manage-student"><img src="/icons/member-list.svg" alt="Manage Student" /><span>Gérer Etudiant</span></a></li>
         </ul>
       </div>
     </header>

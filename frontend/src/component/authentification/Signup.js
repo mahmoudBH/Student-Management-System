@@ -9,7 +9,7 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [mobileNumber, setMobileNumber] = useState(''); // New state for mobile number
+  const [mobileNumber, setMobileNumber] = useState(''); // Nouveau champ pour le numéro de mobile
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -25,7 +25,7 @@ const Signup = () => {
         name: `${firstName} ${lastName}`,
         email,
         password,
-        mobileNumber, // Include mobile number in the request
+        mobileNumber, // Inclure le numéro de mobile dans la requête
       });
 
       localStorage.setItem('user', JSON.stringify({ name: `${firstName} ${lastName}`, email, mobileNumber }));
@@ -40,8 +40,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="container">
-      <form className="form" onSubmit={handleSubmit}>
+    <div className="container"> {/* Même conteneur que dans la page login */}
+      <form className="login-form" onSubmit={handleSubmit}> {/* Remplace "form" par "login-form" */}
         <p className="title">Register</p>
         <p className="message">Signup now and get full access to our app.</p>
         <div className="flex">
@@ -114,7 +114,7 @@ const Signup = () => {
 
         <button type="submit" className="submit">Submit</button>
         {message && <p className="message">{message}</p>}
-        <p className="Login">
+        <p className="signin">
           Already have an account? <Link to="/">Login</Link>
         </p>
       </form>
