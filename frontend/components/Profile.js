@@ -13,7 +13,11 @@ const Profile = ({ setIsLoggedIn }) => {
         const fetchProfile = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
+<<<<<<< HEAD
                 const response = await fetch('http://192.168.1.135:3000/api/profile', {
+=======
+                const response = await fetch('http://192.168.90.123:3000/api/profile', {
+>>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -41,7 +45,11 @@ const Profile = ({ setIsLoggedIn }) => {
     const updateProfile = async () => {
         const token = await AsyncStorage.getItem('token');
         try {
+<<<<<<< HEAD
             const response = await fetch('http://192.168.137.123:5000/api/profile', {
+=======
+            const response = await fetch('http://192.168.90.123:3000/api/profile', {
+>>>>>>> d4a752366ca87e8fbc60ba697b32d1febe6d72e8
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
