@@ -8,6 +8,7 @@ import AddStudentForm from './component/pages/AddStudentForm/AddStudentForm';
 import AddCourseForm from './component/pages/AddCourseForm/AddCourseForm';
 import Profile from './component/pages/Profile/Profile';
 import ManageStudent from './component/pages/ManageStudent/ManageStudent';
+import Message from './component/pages/Message/Message';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/add-course" element={<AddCourseForm />} /> {/* Page pour ajouter un cours en PDF */}
           <Route path="/profile" element={<Profile />} />       {/* Page de profil */}
           <Route path="/manage-student" element={<ManageStudent />} /> {/* Page pour gérer les étudiants */}
+          <Route path="/messages" element={<Message />} />
         </Routes>
       </div>
     </Router>

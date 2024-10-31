@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Header.css';
 
 const Header = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -14,9 +15,27 @@ const Header = () => {
   };
 
   const handleProfileClick = () => {
-    setSidebarOpen(false); // Close sidebar
+    setSidebarOpen(false);
     window.location.href = '/profile';
   };
+
+  // Fonction pour récupérer les données utilisateur
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/user', { credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données de l'utilisateur", error);
+    }
+  };
+
+  // Récupérer les données utilisateur au chargement du composant
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <header className="header">
@@ -35,7 +54,11 @@ const Header = () => {
       </div>
 
       <div className="user-profile">
-        <img src="/images/user.jpg" alt="User Profile" className="header-user-icon" />
+        {user?.photo ? (
+          <img src={user.photo} alt="User Profile" className="header-user-icon" />
+        ) : (
+          <img src="/icons/default-profile.png" alt="Default Profile" className="header-user-icon" />
+        )}
         <div className="dropdown-menu">
           <ul>
             <li>
@@ -62,6 +85,7 @@ const Header = () => {
           <li><a href="/edit-note"><img src="/icons/edit.svg" alt="Edit Notes" /><span>Edit Notes</span></a></li>
           <li><a href="/add-course"><img src="/icons/add.svg" alt="Add Course" /><span>Add Course</span></a></li>
           <li><a href="/manage-student"><img src="/icons/member-list.svg" alt="Manage Student" /><span>Gérer Etudiant</span></a></li>
+          <li><a href="/messages"><img src="/icons/envelope.svg" alt="Messages" /><span>Mssages</span></a></li>
         </ul>
       </div>
     </header>

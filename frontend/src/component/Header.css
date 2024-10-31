@@ -100,8 +100,8 @@
 }
 
 .header-user-icon {
-  width: 40px;
-  height: 40px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -109,8 +109,8 @@
 /* Dropdown Menu */
 .dropdown-menu {
   position: absolute;
-  top: 60px;
-  right: -77px;
+  top: 70px;
+  right: -70px;
   background-color: white;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
@@ -166,7 +166,7 @@
 /* Sidebar styles */
 .sidebar {
   position: fixed;
-  top: 83px;
+  top: 94px;
   left: -220px; /* Position when closed */
   width: 260px;
   height: 100%;

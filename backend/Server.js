@@ -444,6 +444,18 @@ app.delete('/api/students/:id', (req, res) => {
   });
 });
 
+// Endpoint to get messages
+app.get('/api/messages', (req, res) => {
+  const query = 'SELECT id, email, subject, message, created_at FROM support ORDER BY created_at DESC';
+  
+  db.query(query, (error, results) => {
+    if (error) {
+      return res.status(500).json({ error: 'Erreur lors de la récupération des messages' });
+    }
+    res.json(results);
+  });
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

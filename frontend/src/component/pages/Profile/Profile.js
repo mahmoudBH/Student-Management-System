@@ -12,10 +12,32 @@ const Profile = () => {
   const [message, setMessage] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // Nouvel état pour le mot de passe de confirmation
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  // Fonction pour récupérer les données utilisateur
+  // Check user session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/check-session', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (response.status !== 200) {
+          navigate('/'); // Redirect to login if session is invalid
+        } else {
+          fetchUserData(); // Fetch user data if session is valid
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+        navigate('/'); // Redirect on error
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
+
+  // Fetch user data function
   const fetchUserData = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/user', { credentials: 'include' });
@@ -31,17 +53,12 @@ const Profile = () => {
     }
   };
 
-  // Récupérer les données utilisateur et photo à l'initialisation
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  // Gérer le changement de photo
+  // Handle photo change
   const handlePhotoChange = (e) => {
     setPhoto(e.target.files[0]);
   };
 
-  // Enregistrer la photo sur le serveur
+  // Save photo on server
   const handleSavePhoto = async () => {
     if (!photo) {
       setMessage('Veuillez sélectionner une photo');
@@ -64,11 +81,8 @@ const Profile = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        // Mettre à jour la photo de l'utilisateur
         setUser((prevUser) => ({ ...prevUser, photo: data.photo }));
         setMessage('Photo de profil mise à jour avec succès');
-        
-        // Récupérer à nouveau les données utilisateur après la mise à jour
         await fetchUserData();
       } else {
         setMessage("Erreur lors de la mise à jour de la photo de profil");
@@ -83,7 +97,7 @@ const Profile = () => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Enregistrer les informations du profil
+  // Save profile information
   const handleSave = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/user/${user.id}`, {
@@ -100,7 +114,6 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        // Récupérer les données utilisateur mises à jour
         await fetchUserData();
         setIsEditing(false);
         setMessage('Profil mis à jour avec succès');
@@ -112,7 +125,7 @@ const Profile = () => {
     }
   };
 
-  // Gérer la modification du mot de passe
+  // Change password
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       setMessage('Veuillez remplir tous les champs de mot de passe');
@@ -142,7 +155,7 @@ const Profile = () => {
         setIsChangingPassword(false);
         setCurrentPassword('');
         setNewPassword('');
-        setConfirmPassword(''); // Réinitialiser le champ de confirmation
+        setConfirmPassword('');
       } else {
         const errorData = await response.json();
         setMessage(errorData.error || 'Erreur lors de la mise à jour du mot de passe');
@@ -158,12 +171,12 @@ const Profile = () => {
       {message && <p className="Profile-message">{message}</p>}
       {user ? (
         <div className="Profile-content">
-          {/* Photo de profil */}
+          {/* Profile photo */}
           <div className="Profile-photo-container">
             {user.photo && (
               <img 
                 src={user.photo} 
-                alt="Photo de profil" 
+                alt=""  // Updated alt attribute
                 className="Profile-photo" 
               />
             )}
@@ -171,7 +184,7 @@ const Profile = () => {
             <button onClick={handleSavePhoto} className="Profile-button">Enregistrer la photo</button>
           </div>
   
-          {/* Informations utilisateur et modification du mot de passe */}
+          {/* User details and password change */}
           <div className="Profile-details">
             <h2 className="Profile-header">Profil Utilisateur</h2>
   
@@ -189,7 +202,7 @@ const Profile = () => {
                 <span>{user.name}</span>
               )}
             </div>
-            <br></br>
+            <br />
             <div>
               <strong className="Profile-label">Email:</strong>
               {isEditing ? (
@@ -204,7 +217,7 @@ const Profile = () => {
                 <span>{user.email}</span>
               )}
             </div>
-            <br></br>
+            <br />
             <div>
               <strong className="Profile-label">Numéro de téléphone:</strong>
               {isEditing ? (
@@ -225,7 +238,6 @@ const Profile = () => {
                 <button onClick={handleSave} className="Profile-button">Enregistrer</button>
                 <button onClick={() => setIsEditing(false)} className="Profile-secondary-button">Annuler</button>
               </div>
-              
             ) : (
               <button onClick={() => setIsEditing(true)} className="Profile-button">Modifier</button>
             )}
@@ -269,7 +281,6 @@ const Profile = () => {
       )}
     </div>
   );
-  
 };
 
 export default Profile;

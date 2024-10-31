@@ -1,0 +1,52 @@
+.message-container {
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background color */
+    min-height: 100vh; /* Ensure the container covers the full height */
+  }
+  
+  h2 {
+    color: #333; /* Darker color for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+  }
+  
+  .error-message {
+    color: #ff4d4d; /* Red color for error messages */
+    margin: 10px 0; /* Space around the error message */
+  }
+  
+  ul {
+    list-style-type: none; /* Remove default bullet points */
+    padding: 0; /* Remove padding */
+  }
+  
+  .message-item {
+    background-color: #fff; /* White background for each message */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 15px; /* Padding inside the message */
+    margin-bottom: 15px; /* Space between messages */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  }
+  
+  .message-item strong {
+    display: block; /* Make labels display as block */
+    color: #555; /* Darker color for labels */
+    margin-bottom: 5px; /* Space below each label */
+  }
+  
+  .message-item p {
+    margin: 5px 0; /* Space around paragraphs */
+    color: #444; /* Text color for message content */
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 600px) {
+    .message-container {
+      padding: 10px; /* Reduced padding on smaller screens */
+    }
+  
+    .message-item {
+      padding: 10px; /* Reduced padding for message items */
+    }
+  }
+  
