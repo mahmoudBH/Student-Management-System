@@ -18,7 +18,7 @@ const Profile = () => {
   const fetchUserData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch('http://192.168.43.100:3000/api/profile', {
+      const response = await fetch('http://192.168.9.123:3000/api/profile', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -45,7 +45,7 @@ const Profile = () => {
   const handleUpdate = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch('http://192.168.43.100:3000/api/profile', {
+      const response = await fetch('http://192.168.9.123:3000/api/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -74,7 +74,7 @@ const Profile = () => {
 
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch('http://192.168.43.100:3000/api/change-password', {
+      const response = await fetch('http://192.168.9.123:3000/api/change-password', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

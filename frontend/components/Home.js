@@ -1,80 +1,165 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import { View, Text, Alert, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [notes, setNotes] = useState([]);
+    const [error, setError] = useState('');
+    const navigation = useNavigation(); // Hook for navigation
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        
-        if (!token) {
-          throw new Error('No token found in storage.');
+    useEffect(() => {
+        const fetchNotes = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token'); // Retrieve token from storage
+
+                if (!token) {
+                    Alert.alert('Error', 'No token found. Please log in again.');
+                    return; // Exit if no token
+                }
+
+                const response = await fetch('http://192.168.9.123:3000/api/check-new-notes', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                console.log('Response Status:', response.status); // Log status code
+
+                const data = await response.json();
+                console.log('Response Data:', data); // Log response data
+
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status}`); // Include status in error message
+                }
+
+                if (data.success) {
+                    setNotes(data.newNotes);
+                } else {
+                    setNotes([]);
+                }
+            } catch (error) {
+                console.error('Error fetching new notes:', error);
+                setError('Could not fetch notes.'); // General error message
+                Alert.alert('Error', 'Could not fetch notes, please try again later.');
+            }
+        };
+
+        fetchNotes();
+    }, []);
+
+    // Function to mark a note as viewed
+    const markNoteAsViewed = async (noteId) => {
+        try {
+            const token = await AsyncStorage.getItem('token'); // Retrieve token from storage
+            const response = await fetch(`http://192.168.9.123:3000/api/mark-note-viewed/${noteId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error marking note as viewed: ${response.status}`); // Include status in error message
+            }
+
+            const data = await response.json();
+            console.log('Update Response Data:', data); // Log response data
+
+            if (!data.success) {
+                Alert.alert('Error', data.message || 'Could not mark note as viewed.');
+            }
+        } catch (error) {
+            console.error('Error updating note view status:', error);
+            Alert.alert('Error', 'Could not update note view status. Please try again later.');
         }
-    
-        const response = await fetch('http://192.168.43.100:3000/api/session', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`, // Send the token in the Authorization header
-          },
-        });
-    
-        const data = await response.json();
-        console.log('Server response:', data);
-    
-        if (response.ok && data.loggedIn) {
-          setUser(data.user);
-        } else {
-          throw new Error(data.message || 'No user logged in.');
-        }
-      } catch (error) {
-        console.error('Error fetching session:', error);
-        Alert.alert('Erreur', error.message || 'Session invalide ou expirée. Veuillez vous reconnecter.');
-      } finally {
-        setLoading(false);
-      }
     };
-    
 
-    fetchSession();
-  }, []);
+    // Function to render each note as a notification
+    const renderNote = ({ item }) => (
+        <TouchableOpacity 
+            style={styles.noteContainer} 
+            onPress={() => {
+                // Mark the note as viewed
+                markNoteAsViewed(item.id);
+                
+                // Remove the clicked note from the state
+                setNotes((prevNotes) => prevNotes.filter(note => note.id !== item.id));
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="blue" />
-      </View>
+                // Navigate to MesNotes with the note ID
+                navigation.navigate('MesNotes', { noteId: item.id });
+            }}
+        >
+            <View style={styles.notification}>
+                <Text style={styles.notificationText}>
+                    New Note Added: {item.matiere} - Note: {item.note}
+                </Text>
+            </View>
+        </TouchableOpacity>
     );
-  }
 
-  return (
-    <View style={styles.container}>
-      {user ? (
-        <Text style={styles.welcomeText}>
-          Welcome, {user.firstname} {user.lastname}!
-        </Text>
-      ) : (
-        <Text style={styles.welcomeText}>Not logged in.</Text>
-      )}
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>My Notes</Text>
+            {error ? (
+                <Text style={styles.errorText}>{error}</Text>
+            ) : (
+                <FlatList
+                    data={notes}
+                    renderItem={renderNote}
+                    keyExtractor={(item) => item.id.toString()} // Ensure the key is unique
+                    contentContainerStyle={styles.notesList}
+                />
+            )}
+        </View>
+    );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'royalblue',
-  },
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#fff',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    notesList: {
+        paddingBottom: 20,
+    },
+    noteContainer: {
+        padding: 15,
+        marginBottom: 10,
+    },
+    notification: {
+        padding: 15,
+        backgroundColor: '#f0f8ff', // Light blue background for notification
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 1.5,
+        elevation: 2,
+    },
+    notificationText: {
+        fontSize: 16,
+        fontWeight: 'bold', // Bold text for better visibility
+        color: '#333', // Dark text color
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 20,
+    },
 });
 
 export default Home;

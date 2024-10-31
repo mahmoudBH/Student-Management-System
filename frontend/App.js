@@ -12,7 +12,7 @@ import Profile from './components/Profile';
 import MesNotes from './components/MesNotes';
 import MesCours from './components/MesCours';
 import Contact from './components/Contact';
-
+import Support from './components/Support'; // Import Support component
 
 const Drawer = createDrawerNavigator();
 
@@ -31,11 +31,7 @@ const App = () => {
   const checkLoginStatus = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      if (token) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
+      setIsLoggedIn(!!token);
     } catch (error) {
       console.error('Error checking login status:', error);
     }
@@ -113,7 +109,6 @@ const App = () => {
                 title: 'Mes Notes',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="notebook" color={color} size={20} />
-                  
                 ),
               }}
             />
@@ -145,6 +140,16 @@ const App = () => {
                 title: 'Contact',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="account-box" color={color} size={20} />
+                ),
+              }}
+            />
+            <Drawer.Screen
+              name="Support"  // Adding Support page under Contact
+              component={Support}
+              options={{
+                title: 'Support',
+                drawerIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="lifebuoy" color={color} size={20} />
                 ),
               }}
             />

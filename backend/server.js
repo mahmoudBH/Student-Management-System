@@ -13,7 +13,7 @@ const port = 3000;
 
 // Middleware configuration
 app.use(cors({
-    origin: 'http://192.168.43.100:8081',
+    origin: 'http://192.168.9.123:8082',
     credentials: true,
 }));
 app.use(bodyParser.json());
@@ -281,6 +281,75 @@ app.get('/api/contacts', (req, res) => {
       }
     });
   });
+
+// Endpoint to handle support message
+app.post('/support', (req, res) => {
+    const { email, subject, message } = req.body;
+  
+    // Check if email is in the admin table
+    const checkAdminQuery = 'SELECT * FROM admin WHERE email = ?';
+    db.query(checkAdminQuery, [email], (error, results) => {
+      if (error) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+  
+      if (results.length === 0) {
+        return res.status(400).json({ error: 'Email not found in admin table' });
+      }
+  
+      // Insert support message into the support table
+      const insertSupportQuery = 'INSERT INTO support (email, subject, message) VALUES (?, ?, ?)';
+      db.query(insertSupportQuery, [email, subject, message], (error) => {
+        if (error) {
+          return res.status(500).json({ error: 'Failed to send message' });
+        }
+        res.status(200).json({ success: true, message: 'Message sent successfully' });
+      });
+    });
+  });
+
+
+  // Route to check for new notes
+app.get('/api/check-new-notes', authenticateToken, (req, res) => {
+    const userId = req.user.id; // Get user ID from token
+
+    const sql = 'SELECT * FROM note WHERE userId = ? AND viewed = 0'; // Check for unviewed notes
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Error checking for new notes:', err);
+            return res.status(500).json({ success: false, message: 'Error checking for new notes.' });
+        }
+
+        // If there are unviewed notes, return success with the notes
+        if (results.length > 0) {
+            return res.json({ success: true, newNotes: results });
+        } else {
+            return res.json({ success: false, newNotes: [] }); // No new notes
+        }
+    });
+});
+
+// Endpoint to mark a note as viewed
+app.put('/api/mark-note-viewed/:id', authenticateToken, (req, res) => {
+    const noteId = req.params.id; // Get note ID from request parameters
+    const sql = 'UPDATE note SET viewed = 1 WHERE id = ? AND viewed = 0'; // Update viewed status
+
+    db.query(sql, [noteId], (err, results) => {
+        if (err) {
+            console.error('Error marking note as viewed:', err);
+            return res.status(500).json({ success: false, message: 'Error marking note as viewed.' });
+        }
+
+        // Check if the note was updated
+        if (results.affectedRows > 0) {
+            return res.json({ success: true, message: 'Note marked as viewed.' });
+        } else {
+            return res.status(404).json({ success: false, message: 'Note not found or already viewed.' });
+        }
+    });
+});
+
+
 
 // Start server
 app.listen(port, () => {
