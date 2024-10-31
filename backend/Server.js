@@ -9,25 +9,26 @@ const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
 
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Remplacez par l'origine de votre frontend
-  credentials: true, // Autoriser l'envoi de cookies
+  origin: 'http://localhost:3000', // Replace with frontend origin
+  credentials: true,
 }));
 app.use(bodyParser.json());
 
-// Configuration de la session
+// Configure session
 app.use(session({
-  secret: 'votre_secret', // Remplacez par un secret fort
+  secret: 'your_secret', // Replace with a strong secret
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60, // Durée de la session (1 heure par exemple)
+    maxAge: 1000 * 60 * 60, // Session duration: 1 hour
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Utiliser HTTPS en production
+    secure: process.env.NODE_ENV === 'production',
   }
 }));
 
@@ -41,16 +42,32 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.log('Échec de la connexion à la base de données:', err);
+    console.error('Database connection failed:', err);
   } else {
-    console.log('Connecté à la base de données gestion_etudiant');
+    console.log('Connected to gestion_etudiant database');
   }
 });
 
-// Configure multer for PDF file storage with the correct extension
+// Configure multer for photo upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, 'images'); // Directory to save uploaded images
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${req.params.id}_${Date.now()}${path.extname(file.originalname)}`); // Unique filename
+  },
+});
+
+const upload = multer({ storage });
+
+// Servir statiquement le dossier des images
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+
+// Configuration de multer pour stocker les fichiers PDF avec la bonne extension
+const storagepdf = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Dossier de stockage
   },
   filename: (req, file, cb) => {
     const fileExt = path.extname(file.originalname).toLowerCase();
@@ -58,19 +75,21 @@ const storage = multer.diskStorage({
   },
 });
 
-// PDF file filter for multer
+// Filtre pour accepter uniquement les fichiers PDF
 const pdfFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf') {
     cb(null, true);
   } else {
-    cb(new Error('Only PDF files are allowed!'), false);
+    cb(new Error('Seuls les fichiers PDF sont autorisés !'), false);
   }
 };
 
-// Use the storage and filter configurations with multer
-const upload = multer({ storage: storage, fileFilter: pdfFilter });
+// Utilisation de la configuration et du filtre avec multer
+const uploadpdf = multer({ storage: storage, fileFilter: pdfFilter });
 
-// Middleware for session check
+
+
+// Session check middleware
 function sessionCheck(req, res, next) {
   if (req.session.user) {
     next();
@@ -79,16 +98,16 @@ function sessionCheck(req, res, next) {
   }
 }
 
-// Route de vérification de session
+// Route to check session status
 app.get('/api/check-session', (req, res) => {
   if (req.session.user) {
-    res.status(200).json({ message: 'Session valide' });
+    res.status(200).json({ message: 'Session valid' });
   } else {
-    res.status(401).json({ message: 'Session invalide' });
+    res.status(401).json({ message: 'Session invalid' });
   }
 });
 
-// Admin sign-up route
+
 // Admin sign-up route
 app.post('/api/admin/signup', (req, res) => {
   const { name, email, password, mobileNumber } = req.body;
@@ -107,23 +126,34 @@ app.post('/api/admin/signup', (req, res) => {
 });
 
 
-// Admin login route
 app.post('/api/admin/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Requête pour vérifier les identifiants
-  db.query('SELECT id, name, email, password FROM admin WHERE email = ? AND password = ?', [email, password], (err, results) => {
+  // Requête pour vérifier si l'email existe
+  db.query('SELECT id, name, email, password FROM admin WHERE email = ?', [email], (err, results) => {
     if (err) {
       return res.status(500).json({ message: 'Erreur de base de données' });
     }
-    if (results.length > 0) {
-      req.session.user = { id: results[0].id, name: results[0].name, email: results[0].email }; // Établir la session
-      return res.status(200).json({ user: req.session.user, message: 'Connexion réussie' });
-    } else {
-      return res.status(401).json({ message: 'Identifiants invalides' });
+
+    // Vérifie si l'email correspond à un utilisateur
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
+
+    const user = results[0];
+
+    // Vérifie si le mot de passe correspond
+    if (user.password !== password) {
+      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+    }
+
+    // Enregistre les informations de l'utilisateur dans la session
+    req.session.user = { id: user.id, name: user.name, email: user.email };
+
+    return res.status(200).json({ user: req.session.user, message: 'Connexion réussie' });
   });
 });
+
 
 
 // Admin logout route
@@ -201,7 +231,7 @@ app.put('/api/note/:id', sessionCheck, (req, res) => {
 
 
 // Endpoint to add a new course with PDF upload (protected by sessionCheck)
-app.post('/api/cours', sessionCheck, upload.single('pdfFile'), (req, res) => {
+app.post('/api/cours', sessionCheck, uploadpdf.single('pdfFile'), (req, res) => {
   const { matiere, classe } = req.body;
   const pdfPath = req.file.path;
 
@@ -256,21 +286,67 @@ app.get('/api/cours/:id/pdf', (req, res) => {
 
 
 
-// Route pour récupérer les données de l'utilisateur
+// Route pour récupérer les données de l'utilisateur avec photo
 app.get('/api/user', (req, res) => {
-  const userId = req.session.user.id; // Assuming the user ID is stored in the session
+  // Vérifie que la session utilisateur existe
+  if (!req.session.user || !req.session.user.id) {
+    return res.status(401).json({ message: 'Utilisateur non connecté' });
+  }
 
-  db.query('SELECT id, name, email , mobile_number FROM admin WHERE id = ?', [userId], (err, results) => {
+  const userId = req.session.user.id;
+
+  // Sélectionne les informations utilisateur y compris le nom de fichier de la photo
+  db.query('SELECT id, name, email, mobile_number, photo FROM admin WHERE id = ?', [userId], (err, results) => {
     if (err) {
-      return res.status(500).json({ message: 'Database error' });
+      return res.status(500).json({ message: 'Erreur de base de données' });
     }
     if (results.length > 0) {
-      return res.status(200).json(results[0]); // Return user data
+      // Si l'utilisateur existe, retourne les données avec le chemin vers la photo
+      const user = results[0];
+      // Construit l'URL de la photo si elle existe
+      user.photo = user.photo ? `http://localhost:5000/images/${user.photo}` : null; // Assurez-vous que le chemin correspond à votre configuration
+      return res.status(200).json(user);
     } else {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
   });
 });
+
+
+
+// Route to upload user photo
+app.put('/api/user/:id/photo', upload.single('photo'), (req, res) => {
+  const userId = parseInt(req.params.id);
+
+  // Vérifie que le fichier a bien été uploadé
+  if (!req.file) {
+    return res.status(400).json({ message: 'Aucune photo fournie' });
+  }
+
+  // Fetch user from the database
+  db.query('SELECT * FROM admin WHERE id = ?', [userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const photoFilename = req.file.filename;
+
+    // Update the user with the new photo filename
+    db.query('UPDATE admin SET photo = ? WHERE id = ?', [photoFilename, userId], (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error updating photo' });
+      }
+
+      res.json({ photo: photoFilename }); // Return the filename
+    });
+  });
+});
+
+
 
 
 // Route pour mettre à jour les données de l'utilisateur

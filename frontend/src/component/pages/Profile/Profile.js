@@ -8,50 +8,82 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formValues, setFormValues] = useState({ name: '', email: '', mobile_number: '' });
-  const [passwordValues, setPasswordValues] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  const [isPasswordEditing, setIsPasswordEditing] = useState(false);
+  const [photo, setPhoto] = useState(null);
   const [message, setMessage] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // Nouvel état pour le mot de passe de confirmation
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  useEffect(() => {
-    const checkSessionAndFetchUserData = async () => {
-      try {
-        const sessionResponse = await fetch('http://localhost:5000/api/check-session', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (sessionResponse.status !== 200) {
-          navigate('/');
-        } else {
-          const userResponse = await fetch('http://localhost:5000/api/user', {
-            method: 'GET',
-            credentials: 'include',
-          });
-
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            setUser(userData);
-            setFormValues({ name: userData.name, email: userData.email, mobile_number: userData.mobile_number });
-          } else {
-            setMessage('Erreur lors de la récupération des données de l\'utilisateur');
-          }
-        }
-      } catch (error) {
-        setMessage('Erreur lors de la vérification de la session');
-        navigate('/');
+  // Fonction pour récupérer les données utilisateur
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/user', { credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
+        setFormValues({ name: data.name, email: data.email, mobile_number: data.mobile_number });
+      } else {
+        setMessage("Erreur lors de la récupération des données de l'utilisateur");
       }
-    };
+    } catch (error) {
+      setMessage("Erreur lors de la récupération des données de l'utilisateur");
+    }
+  };
 
-    checkSessionAndFetchUserData();
-  }, [navigate]);
+  // Récupérer les données utilisateur et photo à l'initialisation
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
-  const handleEditClick = () => setIsEditing(true);
+  // Gérer le changement de photo
+  const handlePhotoChange = (e) => {
+    setPhoto(e.target.files[0]);
+  };
+
+  // Enregistrer la photo sur le serveur
+  const handleSavePhoto = async () => {
+    if (!photo) {
+      setMessage('Veuillez sélectionner une photo');
+      return;
+    }
+
+    if (!user?.id) {
+      setMessage("L'ID de l'utilisateur est manquant");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('photo', photo);
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/${user.id}/photo`, {
+        method: 'PUT',
+        credentials: 'include',
+        body: formData,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Mettre à jour la photo de l'utilisateur
+        setUser((prevUser) => ({ ...prevUser, photo: data.photo }));
+        setMessage('Photo de profil mise à jour avec succès');
+        
+        // Récupérer à nouveau les données utilisateur après la mise à jour
+        await fetchUserData();
+      } else {
+        setMessage("Erreur lors de la mise à jour de la photo de profil");
+      }
+    } catch (error) {
+      setMessage("Erreur lors de la mise à jour de la photo de profil");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Enregistrer les informations du profil
   const handleSave = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/user/${user.id}`, {
@@ -68,19 +100,10 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        const updatedUserResponse = await fetch('http://localhost:5000/api/user', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (updatedUserResponse.ok) {
-          const updatedUser = await updatedUserResponse.json();
-          setUser(updatedUser);
-          setIsEditing(false);
-          setMessage('Profil mis à jour avec succès');
-        } else {
-          setMessage('Erreur lors de la récupération des données mises à jour de l\'utilisateur');
-        }
+        // Récupérer les données utilisateur mises à jour
+        await fetchUserData();
+        setIsEditing(false);
+        setMessage('Profil mis à jour avec succès');
       } else {
         setMessage('Erreur lors de la mise à jour des données de l\'utilisateur');
       }
@@ -89,13 +112,14 @@ const Profile = () => {
     }
   };
 
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordValues((prev) => ({ ...prev, [name]: value }));
-  };
+  // Gérer la modification du mot de passe
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setMessage('Veuillez remplir tous les champs de mot de passe');
+      return;
+    }
 
-  const handlePasswordSave = async () => {
-    if (passwordValues.newPassword !== passwordValues.confirmPassword) {
+    if (newPassword !== confirmPassword) {
       setMessage('Les nouveaux mots de passe ne correspondent pas');
       return;
     }
@@ -108,17 +132,20 @@ const Profile = () => {
         },
         credentials: 'include',
         body: JSON.stringify({
-          currentPassword: passwordValues.currentPassword,
-          newPassword: passwordValues.newPassword,
+          currentPassword,
+          newPassword,
         }),
       });
 
       if (response.ok) {
-        setIsPasswordEditing(false);
-        setPasswordValues({ currentPassword: '', newPassword: '', confirmPassword: '' });
         setMessage('Mot de passe mis à jour avec succès');
+        setIsChangingPassword(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword(''); // Réinitialiser le champ de confirmation
       } else {
-        setMessage('Erreur lors de la mise à jour du mot de passe');
+        const errorData = await response.json();
+        setMessage(errorData.error || 'Erreur lors de la mise à jour du mot de passe');
       }
     } catch (error) {
       setMessage('Erreur lors de la mise à jour du mot de passe');
@@ -132,6 +159,17 @@ const Profile = () => {
       {user ? (
         <div className="Profile-details">
           <h2 className="Profile-header">Profil Utilisateur</h2>
+          {/* Afficher la photo de l'utilisateur si disponible */}
+          {user.photo && (
+            <img 
+              src={user.photo} 
+              alt="Photo de profil" 
+              className="Profile-photo" 
+            />
+          )}
+          <input type="file" onChange={handlePhotoChange} />
+          <button onClick={handleSavePhoto} className="Profile-button">Enregistrer la photo</button>
+
           <div>
             <strong className="Profile-label">Nom:</strong>
             {isEditing ? (
@@ -146,7 +184,7 @@ const Profile = () => {
               <span>{user.name}</span>
             )}
           </div>
-          <br></br>
+
           <div>
             <strong className="Profile-label">Email:</strong>
             {isEditing ? (
@@ -161,7 +199,7 @@ const Profile = () => {
               <span>{user.email}</span>
             )}
           </div>
-          <br></br>
+
           <div>
             <strong className="Profile-label">Numéro de téléphone:</strong>
             {isEditing ? (
@@ -176,48 +214,49 @@ const Profile = () => {
               <span>{user.mobile_number}</span>
             )}
           </div>
+
           {isEditing ? (
             <div>
               <button onClick={handleSave} className="Profile-button">Enregistrer</button>
               <button onClick={() => setIsEditing(false)} className="Profile-secondary-button">Annuler</button>
             </div>
           ) : (
-            <button onClick={handleEditClick} className="Profile-button">Modifier</button>
+            <button onClick={() => setIsEditing(true)} className="Profile-button">Modifier</button>
           )}
 
-          <h3 className="Profile-section-header">Modifier le mot de passe</h3>
-          {isPasswordEditing ? (
-            <div className="Profile-password-section">
-              <input
-                type="password"
-                name="currentPassword"
-                placeholder="Mot de passe actuel"
-                className="Profile-password-input"
-                value={passwordValues.currentPassword}
-                onChange={handlePasswordChange}
-              />
-              <input
-                type="password"
-                name="newPassword"
-                placeholder="Nouveau mot de passe"
-                className="Profile-password-input"
-                value={passwordValues.newPassword}
-                onChange={handlePasswordChange}
-              />
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirmer le nouveau mot de passe"
-                className="Profile-password-input"
-                value={passwordValues.confirmPassword}
-                onChange={handlePasswordChange}
-              />
-              <button onClick={handlePasswordSave} className="Profile-button">Enregistrer le mot de passe</button>
-              <button onClick={() => setIsPasswordEditing(false)} className="Profile-secondary-button">Annuler</button>
-            </div>
-          ) : (
-            <button onClick={() => setIsPasswordEditing(true)} className="Profile-button">Modifier le mot de passe</button>
-          )}
+          {/* Section pour changer le mot de passe */}
+          <div className="Profile-change-password">
+            <h3>Modifier le mot de passe</h3>
+            {isChangingPassword ? (
+              <>
+                <input
+                  type="password"
+                  placeholder="Mot de passe actuel"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="Profile-input"
+                />
+                <input
+                  type="password"
+                  placeholder="Nouveau mot de passe"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="Profile-input"
+                />
+                <input
+                  type="password"
+                  placeholder="Confirmer le nouveau mot de passe"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="Profile-input"
+                />
+                <button onClick={handleChangePassword} className="Profile-button">Mettre à jour le mot de passe</button>
+                <button onClick={() => setIsChangingPassword(false)} className="Profile-secondary-button">Annuler</button>
+              </>
+            ) : (
+              <button onClick={() => setIsChangingPassword(true)} className="Profile-button">Changer le mot de passe</button>
+            )}
+          </div>
         </div>
       ) : (
         <p>Chargement des données de l'utilisateur...</p>

@@ -75,6 +75,15 @@
   box-shadow: 0 0 8px rgba(42, 157, 143, 0.3);
 }
 
+/* Profile photo upload */
+.Profile-photo {
+  border-radius: 50%;
+  width: 100px; /* Fixed width for photo */
+  height: 100px; /* Fixed height for photo */
+  object-fit: cover; /* Ensures image covers the area */
+  margin-bottom: 20px; /* Space below photo */
+}
+
 /* Primary and secondary buttons */
 .Profile-button,
 .Profile-secondary-button {
@@ -105,21 +114,6 @@
 .Profile-secondary-button:hover {
   background-color: #7f8c8d;
   transform: translateY(-2px);
-}
-
-/* Section headers */
-.Profile-section-header {
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-top: 30px;
-  margin-bottom: 20px;
-  font-weight: 500;
-}
-
-/* Password section styling */
-.Profile-password-section {
-  display: flex;
-  flex-direction: column;
 }
 
 /* Responsive adjustments */
