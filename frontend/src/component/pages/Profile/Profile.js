@@ -157,105 +157,111 @@ const Profile = () => {
       <Header />
       {message && <p className="Profile-message">{message}</p>}
       {user ? (
-        <div className="Profile-details">
-          <h2 className="Profile-header">Profil Utilisateur</h2>
-          {/* Afficher la photo de l'utilisateur si disponible */}
-          {user.photo && (
-            <img 
-              src={user.photo} 
-              alt="Photo de profil" 
-              className="Profile-photo" 
-            />
-          )}
-          <input type="file" onChange={handlePhotoChange} />
-          <button onClick={handleSavePhoto} className="Profile-button">Enregistrer la photo</button>
-
-          <div>
-            <strong className="Profile-label">Nom:</strong>
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                className="Profile-input"
-                value={formValues.name}
-                onChange={handleChange}
+        <div className="Profile-content">
+          {/* Photo de profil */}
+          <div className="Profile-photo-container">
+            {user.photo && (
+              <img 
+                src={user.photo} 
+                alt="Photo de profil" 
+                className="Profile-photo" 
               />
-            ) : (
-              <span>{user.name}</span>
             )}
+            <input type="file" onChange={handlePhotoChange} />
+            <button onClick={handleSavePhoto} className="Profile-button">Enregistrer la photo</button>
           </div>
-
-          <div>
-            <strong className="Profile-label">Email:</strong>
-            {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                className="Profile-input"
-                value={formValues.email}
-                onChange={handleChange}
-              />
-            ) : (
-              <span>{user.email}</span>
-            )}
-          </div>
-
-          <div>
-            <strong className="Profile-label">Numéro de téléphone:</strong>
-            {isEditing ? (
-              <input
-                type="text"
-                name="mobile_number"
-                className="Profile-input"
-                value={formValues.mobile_number}
-                onChange={handleChange}
-              />
-            ) : (
-              <span>{user.mobile_number}</span>
-            )}
-          </div>
-
-          {isEditing ? (
+  
+          {/* Informations utilisateur et modification du mot de passe */}
+          <div className="Profile-details">
+            <h2 className="Profile-header">Profil Utilisateur</h2>
+  
             <div>
-              <button onClick={handleSave} className="Profile-button">Enregistrer</button>
-              <button onClick={() => setIsEditing(false)} className="Profile-secondary-button">Annuler</button>
+              <strong className="Profile-label">Nom:</strong>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="name"
+                  className="Profile-input"
+                  value={formValues.name}
+                  onChange={handleChange}
+                />
+              ) : (
+                <span>{user.name}</span>
+              )}
             </div>
-          ) : (
-            <button onClick={() => setIsEditing(true)} className="Profile-button">Modifier</button>
-          )}
-
-          {/* Section pour changer le mot de passe */}
-          <div className="Profile-change-password">
-            <h3>Modifier le mot de passe</h3>
-            {isChangingPassword ? (
-              <>
+            <br></br>
+            <div>
+              <strong className="Profile-label">Email:</strong>
+              {isEditing ? (
                 <input
-                  type="password"
-                  placeholder="Mot de passe actuel"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  type="email"
+                  name="email"
                   className="Profile-input"
+                  value={formValues.email}
+                  onChange={handleChange}
                 />
+              ) : (
+                <span>{user.email}</span>
+              )}
+            </div>
+            <br></br>
+            <div>
+              <strong className="Profile-label">Numéro de téléphone:</strong>
+              {isEditing ? (
                 <input
-                  type="password"
-                  placeholder="Nouveau mot de passe"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  type="text"
+                  name="mobile_number"
                   className="Profile-input"
+                  value={formValues.mobile_number}
+                  onChange={handleChange}
                 />
-                <input
-                  type="password"
-                  placeholder="Confirmer le nouveau mot de passe"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="Profile-input"
-                />
-                <button onClick={handleChangePassword} className="Profile-button">Mettre à jour le mot de passe</button>
-                <button onClick={() => setIsChangingPassword(false)} className="Profile-secondary-button">Annuler</button>
-              </>
+              ) : (
+                <span>{user.mobile_number}</span>
+              )}
+            </div>
+  
+            {isEditing ? (
+              <div>
+                <button onClick={handleSave} className="Profile-button">Enregistrer</button>
+                <button onClick={() => setIsEditing(false)} className="Profile-secondary-button">Annuler</button>
+              </div>
+              
             ) : (
-              <button onClick={() => setIsChangingPassword(true)} className="Profile-button">Changer le mot de passe</button>
+              <button onClick={() => setIsEditing(true)} className="Profile-button">Modifier</button>
             )}
+  
+            <div className="Profile-change-password">
+              <h3>Modifier le mot de passe</h3>
+              {isChangingPassword ? (
+                <>
+                  <input
+                    type="password"
+                    placeholder="Mot de passe actuel"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="Profile-input"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Nouveau mot de passe"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="Profile-input"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirmer le nouveau mot de passe"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="Profile-input"
+                  />
+                  <button onClick={handleChangePassword} className="Profile-button">Mettre à jour le mot de passe</button>
+                  <button onClick={() => setIsChangingPassword(false)} className="Profile-secondary-button">Annuler</button>
+                </>
+              ) : (
+                <button onClick={() => setIsChangingPassword(true)} className="Profile-button">Changer le mot de passe</button>
+              )}
+            </div>
           </div>
         </div>
       ) : (
@@ -263,6 +269,7 @@ const Profile = () => {
       )}
     </div>
   );
+  
 };
 
 export default Profile;

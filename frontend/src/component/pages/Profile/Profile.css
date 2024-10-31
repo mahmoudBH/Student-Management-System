@@ -1,135 +1,145 @@
-/* Profile.css */
-
-/* Main container */
+/* Main container with additional bottom padding */
 .Profile-container {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 60px; /* Extra padding at the bottom */
+}
+
+.Profile-message {
+  text-align: center;
+  color: green;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Flexbox main section for aligning photo and details side-by-side */
+.Profile-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px; /* Space between photo and details */
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 60px; /* Adds space at the top */
+  padding-bottom: 60px; /* Adds extra space at the bottom */
+}
+
+/* Profile photo container */
+.Profile-photo-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center vertically */
-  padding: 80px 20px 40px 280px; /* Adjust for header and sidebar */
-  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-  min-height: 100vh;
-  font-family: 'Roboto', sans-serif;
+  width: 200px;
+  margin-bottom: 40px; /* Extra space below photo section */
 }
 
-/* Profile header */
-.Profile-header {
-  font-size: 2.5rem;
-  color: #2c3e50;
-  margin-bottom: 30px;
-  text-align: center;
-  font-weight: 700;
-}
-
-/* Message styling */
-.Profile-message {
-  color: #e63946;
+.Profile-photo {
+  display: block;
+  border-radius: 50%;
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
   margin-bottom: 20px;
-  font-weight: 600;
-  font-size: 1.1rem;
 }
 
-/* Profile details container */
+.Profile-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.Profile-button:hover {
+  background-color: #0056b3;
+}
+
+.Profile-secondary-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.Profile-secondary-button:hover {
+  background-color: #5a6268;
+}
+
+/* Profile details section */
 .Profile-details {
   background-color: #ffffff;
   padding: 30px;
   border-radius: 15px;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s, transform 0.3s;
-  margin-top: 20px;
+  margin-bottom: 40px; /* Extra space below profile details */
 }
 
-.Profile-details:hover {
-  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.15);
-  transform: translateY(-5px);
+.Profile-header {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 24px;
 }
 
-/* Label styling */
 .Profile-label {
   font-weight: bold;
-  color: #34495e;
+  color: #555;
   display: block;
-  margin-bottom: 5px; /* Reduced spacing below label */
-  margin-right: 10px; /* New margin for space between label and input */
+  margin-bottom: 5px;
 }
 
-/* Input fields */
-.Profile-input,
-.Profile-password-input {
+.Profile-input {
   width: 100%;
-  padding: 12px 16px;
-  margin-top: 5px;
-  margin-bottom: 25px;
-  border: 1px solid #bdc3c7;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border 0.3s;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.Profile-input:focus,
-.Profile-password-input:focus {
-  border-color: #2a9d8f;
-  outline: none;
-  box-shadow: 0 0 8px rgba(42, 157, 143, 0.3);
+/* Password change section */
+.Profile-change-password {
+  margin-top: 30px;
 }
 
-/* Profile photo upload */
-.Profile-photo {
-  border-radius: 50%;
-  width: 100px; /* Fixed width for photo */
-  height: 100px; /* Fixed height for photo */
-  object-fit: cover; /* Ensures image covers the area */
-  margin-bottom: 20px; /* Space below photo */
+.Profile-change-password h3 {
+  color: #333;
+  margin-bottom: 10px;
 }
 
-/* Primary and secondary buttons */
-.Profile-button,
-.Profile-secondary-button {
-  padding: 12px 24px;
-  margin-top: 15px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
+/* Save photo button */
+.Profile-photo-container input[type="file"] {
+  margin-top: 10px;
 }
 
-.Profile-button {
-  background-color: #2a9d8f;
+.Profile-photo-container .Profile-button {
+  width: auto;
 }
 
-.Profile-button:hover {
-  background-color: #21867a;
-  transform: translateY(-2px);
-}
-
-.Profile-secondary-button {
-  background-color: #95a5a6;
-}
-
-.Profile-secondary-button:hover {
-  background-color: #7f8c8d;
-  transform: translateY(-2px);
-}
-
-/* Responsive adjustments */
+/* Responsive adjustments for mobile */
 @media screen and (max-width: 600px) {
+  .Profile-content {
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 40px; /* Extra padding at the bottom */
+  }
+
+  .Profile-photo-container,
   .Profile-details {
-    width: 90%;
-    padding: 25px;
-  }
-
-  .Profile-header {
-    font-size: 2rem;
-  }
-
-  .Profile-button,
-  .Profile-secondary-button {
     width: 100%;
-    margin-top: 10px;
+    max-width: none;
   }
 }
