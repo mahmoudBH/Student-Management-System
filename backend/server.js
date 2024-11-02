@@ -94,7 +94,6 @@ app.post('/api/signup', (req, res) => {
     });
 });
 
-// Login route
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -118,7 +117,7 @@ app.post('/api/login', (req, res) => {
                 { expiresIn: '1h' }
             );
 
-            // Inclure la photo de profil si elle est présente
+            // Inclure la photo de profil et la classe si elles sont présentes
             const response = {
                 success: true,
                 message: 'Connexion réussie!',
@@ -129,6 +128,7 @@ app.post('/api/login', (req, res) => {
                     lastname: user.lastname,
                     email: user.email,
                     profile_photo: user.profile_photo || null, // Chemin de la photo de profil
+                    class: user.class, // Ajouter la classe ici
                 },
             };
 
@@ -138,6 +138,7 @@ app.post('/api/login', (req, res) => {
         }
     });
 });
+
 
 
 // Logout route

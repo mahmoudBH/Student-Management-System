@@ -52,11 +52,13 @@ const Login = ({ navigation, setIsLoggedIn }) => {
                 // Stocker le token JWT et les informations utilisateur dans AsyncStorage
                 await AsyncStorage.setItem('token', data.token);
                 await AsyncStorage.setItem('user', JSON.stringify(data.user)); // Stocker les données utilisateur
+                await AsyncStorage.setItem('class', data.user.class); // Stocker la classe de l'utilisateur
+    
                 if (data.user.profile_photo) {
                     await AsyncStorage.setItem('profile_photo', data.user.profile_photo); // Stocker la photo de profil
                 }
                 Alert.alert('Succès', 'Connexion réussie!');
-                
+    
                 // Mettre à jour l'état de connexion
                 setIsLoggedIn(true);
     
@@ -73,6 +75,7 @@ const Login = ({ navigation, setIsLoggedIn }) => {
             console.error('Login Error:', error);
         }
     };
+    
     
 
     return (
