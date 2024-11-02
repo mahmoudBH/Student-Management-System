@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajoute AsyncStorage pour stocker le token
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -28,9 +28,9 @@ const Login = ({ navigation, setIsLoggedIn }) => {
             Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
             return;
         }
-
+    
         try {
-            const response = await fetch('http://192.168.9.123:3000/api/login', {
+            const response = await fetch('http://192.168.43.100:3000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,26 +40,30 @@ const Login = ({ navigation, setIsLoggedIn }) => {
                     password,
                 }),
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Une erreur est survenue lors de la connexion.');
             }
-
+    
             const data = await response.json();
-
+    
             if (data.success) {
-                // Stocker le token JWT dans AsyncStorage
+                // Stocker le token JWT et les informations utilisateur dans AsyncStorage
                 await AsyncStorage.setItem('token', data.token);
+                await AsyncStorage.setItem('user', JSON.stringify(data.user)); // Stocker les données utilisateur
+                if (data.user.profile_photo) {
+                    await AsyncStorage.setItem('profile_photo', data.user.profile_photo); // Stocker la photo de profil
+                }
                 Alert.alert('Succès', 'Connexion réussie!');
                 
-                // Update login state after successful login
+                // Mettre à jour l'état de connexion
                 setIsLoggedIn(true);
-
-                // Navigate to Home after login
+    
+                // Naviguer vers l'accueil
                 navigation.navigate('Home', {
-                    firstname: data.firstname,
-                    lastname: data.lastname,
+                    firstname: data.user.firstname,
+                    lastname: data.user.lastname,
                 });
             } else {
                 Alert.alert('Erreur', 'Email ou mot de passe incorrect.');
@@ -69,6 +73,7 @@ const Login = ({ navigation, setIsLoggedIn }) => {
             console.error('Login Error:', error);
         }
     };
+    
 
     return (
         <View style={styles.container}>

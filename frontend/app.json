@@ -1,5 +1,9 @@
 {
   "expo": {
+    "permissions": [
+        "CAMERA",
+        "CAMERA_ROLL"
+    ],
     "name": "gestion-etudiant",
     "slug": "gestion-etudiant",
     "version": "1.0.0",

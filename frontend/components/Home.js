@@ -18,7 +18,7 @@ const Home = () => {
                     return; // Exit if no token
                 }
 
-                const response = await fetch('http://192.168.9.123:3000/api/check-new-notes', {
+                const response = await fetch('http://192.168.43.100:3000/api/check-new-notes', {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -54,7 +54,7 @@ const Home = () => {
     const markNoteAsViewed = async (noteId) => {
         try {
             const token = await AsyncStorage.getItem('token'); // Retrieve token from storage
-            const response = await fetch(`http://192.168.9.123:3000/api/mark-note-viewed/${noteId}`, {
+            const response = await fetch(`http://192.168.43.100:3000/api/mark-note-viewed/${noteId}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`,

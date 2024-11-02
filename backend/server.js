@@ -13,11 +13,13 @@ const port = 3000;
 
 // Middleware configuration
 app.use(cors({
-    origin: 'http://192.168.9.123:8082',
+    origin: 'http://192.168.43.100:8081',
     credentials: true,
 }));
 app.use(bodyParser.json());
 app.use(express.json());
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Initialize session
 app.use(session({
@@ -58,20 +60,29 @@ const storage = multer.diskStorage({
 });
 
 
+
 const upload = multer({ storage: storage });
 
 // Middleware for token authentication
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'Accès non autorisé' });
+
+    if (!token) {
+        console.log('No token provided');
+        return res.status(401).json({ success: false, message: 'Accès non autorisé - Token manquant.' });
+    }
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Token invalide' });
+        if (err) {
+            console.log('Token verification error:', err);
+            return res.status(403).json({ success: false, message: 'Token invalide - Vérifiez le token.' });
+        }
         req.user = user;
         next();
     });
 };
+
 
 // Signup route
 app.post('/api/signup', (req, res) => {
@@ -86,17 +97,48 @@ app.post('/api/signup', (req, res) => {
 // Login route
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
+
+    // Vérification des champs requis
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: 'Email et mot de passe sont requis.' });
+    }
+
     const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
     db.query(sql, [email, password], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: 'Error occurred.' });
+        if (err) {
+            console.error('Erreur lors de la requête SQL:', err);
+            return res.status(500).json({ success: false, message: 'Une erreur est survenue. Veuillez réessayer plus tard.' });
+        }
+
         if (results.length > 0) {
-            const token = jwt.sign({ id: results[0].id, firstname: results[0].firstname, lastname: results[0].lastname }, JWT_SECRET, { expiresIn: '1h' });
-            return res.status(200).json({ success: true, message: 'Login successful!', token, user: { id: results[0].id, firstname: results[0].firstname, lastname: results[0].lastname, email: results[0].email } });
+            const user = results[0];
+            const token = jwt.sign(
+                { id: user.id, firstname: user.firstname, lastname: user.lastname },
+                JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            // Inclure la photo de profil si elle est présente
+            const response = {
+                success: true,
+                message: 'Connexion réussie!',
+                token,
+                user: {
+                    id: user.id,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    email: user.email,
+                    profile_photo: user.profile_photo || null, // Chemin de la photo de profil
+                },
+            };
+
+            return res.status(200).json(response);
         } else {
-            return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+            return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
         }
     });
 });
+
 
 // Logout route
 app.post('/api/logout', (req, res) => {
@@ -148,34 +190,38 @@ app.get('/api/mesnotes', authenticateToken, (req, res) => {
 
 // Profile route - GET
 app.get('/api/profile', authenticateToken, (req, res) => {
-    const userId = req.user.id; // Get the user ID from the token payload
+    const userId = req.user.id;
 
-    const sql = 'SELECT id, firstname, lastname, email, password FROM users WHERE id = ?';
-    
+    const sql = 'SELECT id, firstname, lastname, email, profile_photo FROM users WHERE id = ?';
     db.query(sql, [userId], (err, results) => {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ success: false, message: 'Error retrieving profile.' });
         }
-        
+
         if (results.length === 0) {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
-        return res.status(200).json({ success: true, data: results[0] });
+        const user = results[0];
+        // Create the complete URL for the profile photo
+        user.profile_photo = user.profile_photo ? `http://192.168.43.100:3000/uploads/${user.profile_photo}` : null;
+
+        return res.status(200).json({ success: true, data: user });
     });
 });
+
 
 // Profile route - PUT
 app.put('/api/profile', authenticateToken, (req, res) => {
     const userId = req.user.id;
-    const { firstname, lastname, email, password } = req.body;
+    const { firstname, lastname, email } = req.body; // Removed password from profile update
 
     // Prepare SQL query
-    const sql = 'UPDATE users SET firstname = ?, lastname = ?, email = ?, password = ? WHERE id = ?';
+    const sql = 'UPDATE users SET firstname = ?, lastname = ?, email = ? WHERE id = ?';
 
     // Execute the query
-    db.query(sql, [firstname, lastname, email, password, userId], (err, results) => {
+    db.query(sql, [firstname, lastname, email, userId], (err, results) => {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ success: false, message: 'Error updating profile.' });
@@ -189,30 +235,28 @@ app.put('/api/profile', authenticateToken, (req, res) => {
     });
 });
 
-
 // Update password route
 app.put('/api/change-password', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { currentPassword, newPassword } = req.body; // Get the current and new password from the request body
 
-    // Check if the current password is correct (this is important for security)
+    // Check if the current password is correct
     const sql = 'SELECT password FROM users WHERE id = ?';
     db.query(sql, [userId], (err, results) => {
         if (err) return res.status(500).json({ success: false, message: 'Error verifying current password.' });
-        
+
         if (results.length === 0) {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
         const storedPassword = results[0].password;
 
-        // Here you would normally compare the currentPassword with the stored password
-        // Since you mentioned no hashing, this is just a simple check
+        // Simple check for current password
         if (currentPassword !== storedPassword) {
             return res.status(403).json({ success: false, message: 'Current password is incorrect.' });
         }
 
-        // Update the password (without hashing as per your requirement)
+        // Update the password without hashing
         const updateSql = 'UPDATE users SET password = ? WHERE id = ?';
         db.query(updateSql, [newPassword, userId], (err, results) => {
             if (err) return res.status(500).json({ success: false, message: 'Error updating password.' });
@@ -222,20 +266,21 @@ app.put('/api/change-password', authenticateToken, (req, res) => {
     });
 });
 
-
 // Route for uploading profile photo
 app.put('/api/upload-photo', authenticateToken, upload.single('profile_photo'), (req, res) => {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
 
     const userId = req.user.id;
-    const photoPath = req.file.path;
+    const photoName = req.file.filename; // Use only the file name
 
     const sql = 'UPDATE users SET profile_photo = ? WHERE id = ?';
-    db.query(sql, [photoPath, userId], (err, results) => {
+    db.query(sql, [photoName, userId], (err, results) => {
         if (err) return res.status(500).json({ success: false, message: 'Error updating profile photo.' });
-        return res.status(200).json({ success: true, message: 'Profile photo updated successfully!', photoPath });
+        
+        return res.status(200).json({ success: true, message: 'Profile photo updated successfully!', photoName });
     });
 });
+
 
 // Route to add a course with a PDF file
 app.post('/api/cours', authenticateToken, upload.single('pdfFile'), (req, res) => {
