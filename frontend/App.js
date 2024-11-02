@@ -13,6 +13,7 @@ import MesNotes from './components/MesNotes';
 import MesCours from './components/MesCours';
 import Contact from './components/Contact';
 import Support from './components/Support'; // Import Support component
+import axios from 'axios'; // Import axios for API requests
 
 const Drawer = createDrawerNavigator();
 
@@ -27,6 +28,7 @@ const CustomDrawerContent = (props) => {
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+  const [unreadCount, setUnreadCount] = useState(0); // State to track unread notifications
 
   const checkLoginStatus = async () => {
     try {
@@ -37,9 +39,31 @@ const App = () => {
     }
   };
 
+  const fetchUnreadNotifications = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get('http://192.168.232.123:4000/api/unread-notifications', {
+        headers: {
+          Authorization: token,
+        },
+      });
+
+      // Assuming response.data.notifications returns an array of notifications
+      const notifications = response.data.notifications;
+      if (notifications) {
+        setUnreadCount(notifications.length);
+      }
+    } catch (error) {
+      console.error('Error fetching unread notifications:', error);
+    }
+  };
+
   useEffect(() => {
     checkLoginStatus();
-  }, []);
+    if (isLoggedIn) {
+      fetchUnreadNotifications(); // Fetch unread notifications if logged in
+    }
+  }, [isLoggedIn]);
 
   return (
     <NavigationContainer>
@@ -167,6 +191,16 @@ const App = () => {
           </>
         )}
       </Drawer.Navigator>
+
+      {/* Notification Indicator */}
+      {isLoggedIn && (
+        <View style={styles.notificationContainer}>
+          <MaterialCommunityIcons name="bell" size={24} color="#6200ee" />
+          {unreadCount > 0 && (
+            <Text style={styles.notificationCount}>{unreadCount}</Text>
+          )}
+        </View>
+      )}
     </NavigationContainer>
   );
 };
@@ -183,6 +217,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#6200ee',
     marginBottom: 20,
+  },
+  notificationContainer: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 8,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  notificationCount: {
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 5,
   },
 });
 

@@ -13,7 +13,7 @@ const port = 4000;
 
 // Middleware configuration
 app.use(cors({
-    origin: 'http://192.168.43.100:8081',
+    origin: 'http://192.168.232.123:4000:8082',
     credentials: true,
 }));
 app.use(bodyParser.json());
@@ -96,24 +96,47 @@ app.post('/api/signup', (req, res) => {
 
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
-
-    // Vérification des champs requis
-    if (!email || !password) {
-        return res.status(400).json({ success: false, message: 'Email et mot de passe sont requis.' });
-    }
-
     const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
     
     db.query(sql, [email, password], (err, results) => {
         if (err) return res.status(500).json({ success: false, message: 'Error occurred.' });
+        
         if (results.length > 0) {
-            const token = jwt.sign({ id: results[0].id, firstname: results[0].firstname, lastname: results[0].lastname }, JWT_SECRET, { expiresIn: '1h' });
-            return res.status(200).json({ success: true, message: 'Login successful!', token, user: { id: results[0].id, firstname: results[0].firstname, lastname: results[0].lastname, email: results[0].email } });
+            const user = results[0];
+            
+            // Add class and profile_photo to the token payload
+            const token = jwt.sign(
+                { 
+                    id: user.id, 
+                    firstname: user.firstname, 
+                    lastname: user.lastname, 
+                    class: user.class,
+                    profile_photo: user.profile_photo || null // Include profile photo in token payload
+                }, 
+                JWT_SECRET, 
+                { expiresIn: '1h' }
+            );
+            
+            return res.status(200).json({ 
+                success: true, 
+                message: 'Login successful!', 
+                token, 
+                user: { 
+                    id: user.id, 
+                    firstname: user.firstname, 
+                    lastname: user.lastname, 
+                    email: user.email, 
+                    class: user.class,
+                    profile_photo: user.profile_photo || null // Include profile photo in response data
+                } 
+            });
         } else {
-            return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
+            return res.status(401).json({ success: false, message: 'Invalid email or password.' });
         }
     });
 });
+
+
 
 // Logout route
 app.post('/api/logout', (req, res) => {
@@ -180,7 +203,7 @@ app.get('/api/profile', authenticateToken, (req, res) => {
 
         const user = results[0];
         // Create the complete URL for the profile photo
-        user.profile_photo = user.profile_photo ? `http://192.168.43.100:3000/uploads/${user.profile_photo}` : null;
+        user.profile_photo = user.profile_photo ? `http://192.168.232.123:4000/uploads/${user.profile_photo}` : null;
 
         return res.status(200).json({ success: true, data: user });
     });
@@ -368,11 +391,6 @@ app.put('/api/mark-note-viewed/:id', authenticateToken, (req, res) => {
         }
     });
 });
-// server.js
-
-// server.js
-
-// server.js
 
 // Route to check for new courses
 app.get('/api/check-new-courses', authenticateToken, (req, res) => {
@@ -415,9 +433,35 @@ app.put('/api/mark-course-viewed/:id', authenticateToken, (req, res) => {
     });
 });
 
-
-
-
+// API endpoint to get unread notifications count
+app.get('/api/unread-notifications', (req, res) => {
+    const userId = req.query.userId; // Assuming you pass userId to filter notifications
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+  
+    // Query to count unread notes and courses
+    const query = `
+      SELECT 
+        (SELECT COUNT(*) FROM note WHERE userId = ? AND viewed = 0) AS unreadNotes,
+        (SELECT COUNT(*) FROM cours WHERE class = ? AND viewed = 0) AS unreadCourses
+    `;
+  
+    db.query(query, [userId, userId], (error, results) => {
+      if (error) {
+        console.error('Error querying database:', error);
+        return res.status(500).json({ error: 'Database query failed' });
+      }
+  
+      const unreadCount = {
+        notes: results[0].unreadNotes,
+        courses: results[0].unreadCourses,
+      };
+  
+      res.json(unreadCount);
+    });
+  });
 
 // Start server
 app.listen(port, () => {
