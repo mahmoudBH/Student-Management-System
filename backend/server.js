@@ -9,7 +9,7 @@ const path = require('path');
 const app = express();
 const fs = require('fs');
 
-const port = 3000;
+const port = 4000;
 
 // Middleware configuration
 app.use(cors({
@@ -103,43 +103,17 @@ app.post('/api/login', (req, res) => {
     }
 
     const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
+    
     db.query(sql, [email, password], (err, results) => {
-        if (err) {
-            console.error('Erreur lors de la requête SQL:', err);
-            return res.status(500).json({ success: false, message: 'Une erreur est survenue. Veuillez réessayer plus tard.' });
-        }
-
+        if (err) return res.status(500).json({ success: false, message: 'Error occurred.' });
         if (results.length > 0) {
-            const user = results[0];
-            const token = jwt.sign(
-                { id: user.id, firstname: user.firstname, lastname: user.lastname },
-                JWT_SECRET,
-                { expiresIn: '1h' }
-            );
-
-            // Inclure la photo de profil et la classe si elles sont présentes
-            const response = {
-                success: true,
-                message: 'Connexion réussie!',
-                token,
-                user: {
-                    id: user.id,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    email: user.email,
-                    profile_photo: user.profile_photo || null, // Chemin de la photo de profil
-                    class: user.class, // Ajouter la classe ici
-                },
-            };
-
-            return res.status(200).json(response);
+            const token = jwt.sign({ id: results[0].id, firstname: results[0].firstname, lastname: results[0].lastname }, JWT_SECRET, { expiresIn: '1h' });
+            return res.status(200).json({ success: true, message: 'Login successful!', token, user: { id: results[0].id, firstname: results[0].firstname, lastname: results[0].lastname, email: results[0].email } });
         } else {
             return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
         }
     });
 });
-
-
 
 // Logout route
 app.post('/api/logout', (req, res) => {
@@ -307,7 +281,7 @@ app.get('/api/mescours', authenticateToken, (req, res) => {
         if (userResult.length === 0) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
 
         const userClass = userResult[0].class;
-        const sql = 'SELECT *, CONCAT("http://192.168.43.100:3000/uploads/", pdf_path) AS fileUrl FROM cours WHERE classe = ?';
+        const sql = 'SELECT *, CONCAT("http://192.168.232.123:4000/uploads/", pdf_path) AS fileUrl FROM cours WHERE classe = ?';
         db.query(sql, [userClass], (err, results) => {
             if (err) return res.status(500).json({ success: false, message: 'Erreur lors de la récupération des cours.' });
             res.json(results);
@@ -394,6 +368,54 @@ app.put('/api/mark-note-viewed/:id', authenticateToken, (req, res) => {
         }
     });
 });
+// server.js
+
+// server.js
+
+// server.js
+
+// Route to check for new courses
+app.get('/api/check-new-courses', authenticateToken, (req, res) => {
+    const classId = req.user.class; // Get class ID from the authenticated user token
+
+    // Query to fetch new courses that belong to the user's class and have not been viewed
+    const sql = 'SELECT * FROM cours WHERE classe = ? AND viewed = 0';
+    db.query(sql, [classId], (err, results) => {
+        if (err) {
+            console.error('Error checking for new courses:', err);
+            return res.status(500).json({ success: false, message: 'Error checking for new courses.' });
+        }
+
+        // If there are unviewed courses, return success with the courses
+        if (results.length > 0) {
+            return res.json({ success: true, newCourses: results });
+        } else {
+            return res.json({ success: false, newCourses: [] }); // No new courses
+        }
+    });
+});
+
+// Endpoint to mark a course as viewed
+app.put('/api/mark-course-viewed/:id', authenticateToken, (req, res) => {
+    const courseId = req.params.id; // Get course ID from request parameters
+    const sql = 'UPDATE cours SET viewed = 1 WHERE id = ? AND viewed = 0'; // Update viewed status
+
+    db.query(sql, [courseId], (err, results) => {
+        if (err) {
+            console.error('Error marking course as viewed:', err);
+            return res.status(500).json({ success: false, message: 'Error marking course as viewed.' });
+        }
+
+        // Check if the course was updated
+        if (results.affectedRows > 0) {
+            return res.json({ success: true, message: 'Course marked as viewed.' });
+        } else {
+            return res.status(404).json({ success: false, message: 'Course not found or already viewed.' });
+        }
+    });
+});
+
+
 
 
 
