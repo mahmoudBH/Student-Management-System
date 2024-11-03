@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
 const Login = ({ navigation, setIsLoggedIn }) => {
     const pulseAnim = new Animated.Value(1);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [focusedInput, setFocusedInput] = useState({});
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         const animationLoop = Animated.loop(
@@ -19,50 +23,39 @@ const Login = ({ navigation, setIsLoggedIn }) => {
         return () => animationLoop.stop();
     }, [pulseAnim]);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [focusedInput, setFocusedInput] = useState({});
-
     const handleLogin = async () => {
         if (!email || !password) {
             Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
             return;
         }
-    
+
         try {
             const response = await fetch('http://192.168.228.100:4000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    email,
-                    password,
-                }),
+                body: JSON.stringify({ email, password }),
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Une erreur est survenue lors de la connexion.');
             }
-    
+
             const data = await response.json();
-    
+
             if (data.success) {
-                // Stocker le token JWT et les informations utilisateur dans AsyncStorage
                 await AsyncStorage.setItem('token', data.token);
-                await AsyncStorage.setItem('user', JSON.stringify(data.user)); // Stocker les données utilisateur
-                await AsyncStorage.setItem('class', data.user.class); // Stocker la classe de l'utilisateur
-    
+                await AsyncStorage.setItem('user', JSON.stringify(data.user));
+                await AsyncStorage.setItem('class', data.user.class);
+
                 if (data.user.profile_photo) {
-                    await AsyncStorage.setItem('profile_photo', data.user.profile_photo); // Stocker la photo de profil
+                    await AsyncStorage.setItem('profile_photo', data.user.profile_photo);
                 }
                 Alert.alert('Succès', 'Connexion réussie!');
-    
-                // Mettre à jour l'état de connexion
+
                 setIsLoggedIn(true);
-    
-                // Naviguer vers l'accueil
                 navigation.navigate('Home', {
                     firstname: data.user.firstname,
                     lastname: data.user.lastname,
@@ -75,12 +68,28 @@ const Login = ({ navigation, setIsLoggedIn }) => {
             console.error('Login Error:', error);
         }
     };
-    
-    
+
+    const onRefresh = () => {
+        setIsRefreshing(true);
+        // Reset form fields
+        setEmail('');
+        setPassword('');
+        setFocusedInput({});
+        
+        // Simulate a refresh action with a timeout
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 1000); // Adjust the duration as needed
+    };
 
     return (
         <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContainer}
+                refreshControl={
+                    <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+                }
+            >
                 <View style={styles.form}>
                     <View style={styles.titleContainer}>
                         <View style={styles.dot} />

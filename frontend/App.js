@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Login from './components/Login';
 import SignupForm from './components/Signup';
@@ -16,7 +16,7 @@ import Support from './components/Support';
 
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = ({ setIsLoggedIn, ...props }) => {
+const CustomDrawerContent = ({ setIsLoggedIn, refreshData, ...props }) => {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -26,19 +26,17 @@ const CustomDrawerContent = ({ setIsLoggedIn, ...props }) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const response = await fetch('http://192.168.228.100:4000/api/profile', {
-          method: 'GET', // Utiliser la méthode GET
+          method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = await response.json();
         if (data.success) {
-          // Mise à jour des états avec les données reçues
           setProfilePhoto(data.data.profile_photo);
           setFirstName(data.data.firstname);
           setLastName(data.data.lastname);
         } else {
-          // Déconnexion si la récupération échoue
           await AsyncStorage.multiRemove(['token', 'firstname', 'lastname', 'profile_photo']);
           setIsLoggedIn(false);
         }
@@ -47,12 +45,16 @@ const CustomDrawerContent = ({ setIsLoggedIn, ...props }) => {
       console.error('Error fetching user data:', error);
     }
   };
-  
-  
 
   useEffect(() => {
     fetchUserData();
-  }, []); // Le tableau vide signifie que cela s'exécute uniquement au montage
+  }, [refreshData]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserData();
+    }, [refreshData])
+  );
 
   return (
     <View style={styles.drawerContent}>
@@ -70,6 +72,7 @@ const CustomDrawerContent = ({ setIsLoggedIn, ...props }) => {
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [refreshData, setRefreshData] = useState(false);
 
   const checkLoginStatus = async () => {
     try {
@@ -84,32 +87,40 @@ const App = () => {
     checkLoginStatus();
   }, []);
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      setRefreshData(prev => !prev); // Trigger refresh when logged in
+    }
+  }, [isLoggedIn]);
+
   return (
     <NavigationContainer>
       <Drawer.Navigator
         initialRouteName="Login"
         screenOptions={{
           drawerStyle: {
-            backgroundColor: '#E3F2FD', // Fond bleu clair du drawer
+            backgroundColor: '#E3F2FD',
             width: 280,
           },
           drawerLabelStyle: {
             fontSize: 16,
             fontWeight: 'bold',
-            color: '#1A237E', // Couleur bleu foncé des labels
+            color: '#1A237E',
           },
-          drawerActiveBackgroundColor: '#BBDEFB', // Fond bleu clair de l'élément actif
-          drawerActiveTintColor: '#0D47A1', // Couleur bleu foncé de texte de l'élément actif
-          drawerInactiveTintColor: '#1A237E', // Couleur bleu foncé des éléments inactifs
+          drawerActiveBackgroundColor: '#BBDEFB',
+          drawerActiveTintColor: '#0D47A1',
+          drawerInactiveTintColor: '#1A237E',
           headerStyle: {
-            backgroundColor: '#0D47A1', // Fond bleu foncé de l'en-tête
+            backgroundColor: '#0D47A1',
           },
-          headerTintColor: '#FFF', // Couleur du texte blanc de l'en-tête
+          headerTintColor: '#FFF',
           headerTitleStyle: {
             fontWeight: 'bold',
           },
         }}
-        drawerContent={(props) => <CustomDrawerContent {...props} setIsLoggedIn={setIsLoggedIn} />}
+        drawerContent={(props) => (
+          <CustomDrawerContent {...props} setIsLoggedIn={setIsLoggedIn} refreshData={refreshData} />
+        )}
       >
         {!isLoggedIn ? (
           <>
@@ -176,7 +187,7 @@ const App = () => {
                 ) 
               }}
             >
-              {(props) => <Profile {...props} setIsLoggedIn={setIsLoggedIn} />}
+              {(props) => <Profile {...props} setIsLoggedIn={setIsLoggedIn} setRefreshData={setRefreshData} />}
             </Drawer.Screen>
             <Drawer.Screen
               name="Contact"
@@ -221,21 +232,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     paddingHorizontal: 16,
-    backgroundColor: '#ffff', // Fond bleu clair du drawer
+    backgroundColor: '#ffff',
   },
   profilePhoto: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100, // Augmenté à 100
+    height: 100, // Augmenté à 100
+    borderRadius: 50, // Ajusté pour correspondre à la nouvelle taille
     marginBottom: 10,
     alignSelf: 'center',
-    borderColor: '#1A237E', // Couleur bleu foncé de bordure pour la photo
+    borderColor: '#1A237E',
     borderWidth: 2,
   },
   userName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '600',
-    color: '#0D47A1', // Couleur bleu foncé du texte pour le nom
+    color: '#0D47A1',
     textAlign: 'center',
     marginBottom: 20,
   },

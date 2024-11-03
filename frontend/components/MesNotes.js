@@ -1,36 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MesNotes = () => {
     const [notes, setNotes] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchNotes = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            const response = await fetch('http://192.168.228.100:4000/api/mesnotes', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setNotes(data);
+            } else {
+                console.log('Error fetching notes:', response.status);
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchNotes = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token'); // Retrieve token from storage
-
-                const response = await fetch('http://192.168.228.100:4000/api/mesnotes', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setNotes(data); // Set notes data
-                } else {
-                    console.log('Error fetching notes:', response.status);
-                }
-            } catch (error) {
-                console.log('Error:', error);
-            }
-        };
-
         fetchNotes();
     }, []);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchNotes().then(() => setRefreshing(false));
+    };
 
     const renderNote = ({ item }) => (
         <View style={styles.noteItem}>
@@ -44,11 +49,10 @@ const MesNotes = () => {
         </View>
     );
 
-    // Function to apply different styles based on the grade
     const getGradeStyle = (grade) => {
-        if (grade >= 16) return { backgroundColor: '#4CAF50' }; // Excellent
-        if (grade >= 12) return { backgroundColor: '#FFC107' }; // Good
-        return { backgroundColor: '#F44336' }; // Needs Improvement
+        if (grade >= 16) return { backgroundColor: '#4CAF50' };
+        if (grade >= 12) return { backgroundColor: '#FFC107' };
+        return { backgroundColor: '#F44336' };
     };
 
     return (
@@ -58,6 +62,9 @@ const MesNotes = () => {
                 data={notes}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderNote}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
             />
         </View>
     );

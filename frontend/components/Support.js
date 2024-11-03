@@ -1,11 +1,12 @@
 // components/Support.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, RefreshControl } from 'react-native';
 
 const Support = () => {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -34,8 +35,22 @@ const Support = () => {
     }
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setEmail('');
+    setSubject('');
+    setMessage('');
+    setRefreshing(false);
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <Text style={styles.header}>Support</Text>
       <TextInput
         style={styles.input}
         placeholder="Your Email"
@@ -63,7 +78,7 @@ const Support = () => {
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Send Message</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

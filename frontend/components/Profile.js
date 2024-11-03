@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert, TextInput, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert, TextInput, ScrollView, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 
 const Profile = () => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,34 +15,36 @@ const Profile = () => {
     const [email, setEmail] = useState('');
     const [profilePhoto, setProfilePhoto] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-                const response = await fetch('http://192.168.228.100:4000/api/profile', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
+    const fetchData = async () => {
+        setRefreshing(true); // Démarrer le rafraîchissement
+        try {
+            const token = await AsyncStorage.getItem('token');
+            const response = await fetch('http://192.168.228.100:4000/api/profile', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-                const jsonResponse = await response.json();
-                if (jsonResponse.success) {
-                    setUserData(jsonResponse.data);
-                    setFirstname(jsonResponse.data.firstname);
-                    setLastname(jsonResponse.data.lastname);
-                    setEmail(jsonResponse.data.email);
-                } else {
-                    console.error('Erreur lors de la récupération des données:', jsonResponse.message);
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-            } finally {
-                setLoading(false);
+            const jsonResponse = await response.json();
+            if (jsonResponse.success) {
+                setUserData(jsonResponse.data);
+                setFirstname(jsonResponse.data.firstname);
+                setLastname(jsonResponse.data.lastname);
+                setEmail(jsonResponse.data.email);
+            } else {
+                console.error('Erreur lors de la récupération des données:', jsonResponse.message);
             }
-        };
+        } catch (error) {
+            console.error('Erreur:', error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false); // Arrêter le rafraîchissement
+        }
+    };
 
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -59,6 +62,7 @@ const Profile = () => {
         const jsonResponse = await response.json();
         if (jsonResponse.success) {
             Alert.alert('Success', 'Profile updated successfully!');
+            fetchData(); // Rafraîchir les données après mise à jour
         } else {
             Alert.alert('Error', jsonResponse.message);
         }
@@ -86,6 +90,7 @@ const Profile = () => {
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
+            fetchData(); // Rafraîchir les données après changement de mot de passe
         } else {
             Alert.alert('Error', jsonResponse.message);
         }
@@ -126,6 +131,7 @@ const Profile = () => {
             const uploadJsonResponse = await uploadResponse.json();
             if (uploadJsonResponse.success) {
                 Alert.alert('Success', 'Profile photo updated successfully!');
+                fetchData(); // Rafraîchir les données après mise à jour de la photo
             } else {
                 Alert.alert('Error', uploadJsonResponse.message);
             }
@@ -141,15 +147,23 @@ const Profile = () => {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView
+            contentContainerStyle={styles.container}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={fetchData}
+                />
+            }
+        >
             <Text style={styles.title}>Profile</Text>
             <View style={styles.photoContainer}>
                 <Image
                     source={{ uri: profilePhoto || userData.profile_photo }}
                     style={styles.profilePhoto}
                 />
-                <TouchableOpacity style={styles.button} onPress={handlePhotoSelect}>
-                    <Text style={styles.buttonText}>Select Photo</Text>
+                <TouchableOpacity style={styles.photoButton} onPress={handlePhotoSelect}>
+                    <Text style={styles.photoButtonText}>Select Photo</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.editSection}>
@@ -171,8 +185,9 @@ const Profile = () => {
                     placeholder="Email"
                     value={email}
                     onChangeText={setEmail}
+                    keyboardType="email-address"
                 />
-                <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+                <TouchableOpacity style={styles.primaryButton} onPress={handleUpdate}>
                     <Text style={styles.buttonText}>Update Profile</Text>
                 </TouchableOpacity>
             </View>
@@ -199,7 +214,7 @@ const Profile = () => {
                     onChangeText={setConfirmPassword}
                     secureTextEntry
                 />
-                <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
+                <TouchableOpacity style={styles.primaryButton} onPress={handleChangePassword}>
                     <Text style={styles.buttonText}>Change Password</Text>
                 </TouchableOpacity>
             </View>
@@ -237,73 +252,91 @@ const styles = StyleSheet.create({
         borderRadius: 60,
         marginBottom: 10,
         borderColor: '#ddd',
-        borderWidth: 1,
+        borderWidth: 2,
         backgroundColor: '#fff',
     },
     editSection: {
         width: '100%',
-        padding: 15,
+        padding: 20,
         borderRadius: 10,
         backgroundColor: '#fff',
         marginBottom: 20,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 4,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 4,
     },
     passwordSection: {
         width: '100%',
-        padding: 15,
+        padding: 20,
         borderRadius: 10,
         backgroundColor: '#fff',
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 4,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 4,
     },
     sectionTitle: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
-        color: '#1E90FF',
-        marginBottom: 10,
+        color: '#333',
+        marginBottom: 15,
     },
     input: {
         height: 50,
-        borderColor: '#ccc',
+        borderColor: '#007bff',
         borderWidth: 1,
-        borderRadius: 25,
+        borderRadius: 10,
+        paddingHorizontal: 15,
         marginBottom: 15,
-        paddingHorizontal: 20,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#f1f1f1',
         fontSize: 16,
-        color: '#333',
     },
-    button: {
-        width: '100%', // Set the button width to 100%
-        height: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
+    photoButton: {
+        backgroundColor: '#6c757d', // Couleur du bouton pour sélectionner la photo
+        paddingVertical: 10,
+        borderRadius: 10,
         alignItems: 'center',
-        backgroundColor: '#1E90FF',
-        marginTop: 10,
+        width: '100%',
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
             height: 2,
         },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 2,
+        elevation: 3,
+    },
+    primaryButton: {
+        backgroundColor: '#007bff', // Couleur bleu pour le bouton principal
+        paddingVertical: 12,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginVertical: 10,
+        width: '100%',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
     },
     buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    photoButtonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',

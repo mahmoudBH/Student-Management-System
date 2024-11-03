@@ -1,36 +1,44 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 
 const MesCours = () => {
     const [cours, setCours] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchCours = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            const response = await fetch('http://192.168.228.100:4000/api/mescours', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCours(data);
+            } else {
+                console.log('Error fetching courses:', response.status);
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        } finally {
+            setRefreshing(false); // Arrêter le rafraîchissement une fois les données récupérées
+        }
+    };
 
     useEffect(() => {
-        const fetchCours = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-                const response = await fetch('http://192.168.228.100:4000/api/mescours', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setCours(data);
-                } else {
-                    console.log('Error fetching courses:', response.status);
-                }
-            } catch (error) {
-                console.log('Error:', error);
-            }
-        };
-
         fetchCours();
     }, []);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchCours(); // Relancer la récupération des cours
+    };
 
     const handleDownload = async (fileUrl) => {
         if (!fileUrl || !/^https?:\/\//.test(fileUrl)) {
@@ -67,6 +75,9 @@ const MesCours = () => {
                 data={cours}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderCourse}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
             />
         </View>
     );
@@ -115,4 +126,5 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
 });
+
 export default MesCours;

@@ -1,12 +1,14 @@
 // components/Contact.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 
 const Contact = () => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchContacts = async () => {
+    setLoading(true);
     try {
       const response = await fetch('http://192.168.228.100:4000/api/contacts'); // Adjust port if needed
       const data = await response.json();
@@ -16,6 +18,12 @@ const Contact = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchContacts();
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -39,6 +47,9 @@ const Contact = () => {
             <Text style={styles.mobile}>📞 {item.mobile_number}</Text>
           </View>
         )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );

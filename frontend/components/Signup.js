@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert, RefreshControl } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 const { width } = Dimensions.get('window');
@@ -12,6 +12,7 @@ const SignupForm = ({ navigation }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [selectedClass, setSelectedClass] = useState('');
     const [focusedInput, setFocusedInput] = useState({});
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const pulseAnim = new Animated.Value(1);
 
     useEffect(() => {
@@ -58,9 +59,28 @@ const SignupForm = ({ navigation }) => {
             });
     };
 
+    const onRefresh = () => {
+        setIsRefreshing(true);
+        // Simulate a network request or reset your form values
+        setTimeout(() => {
+            setFirstname('');
+            setLastname('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+            setSelectedClass('');
+            setIsRefreshing(false);
+        }, 1000); // Adjust the duration as needed
+    };
+
     return (
         <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView 
+                contentContainerStyle={styles.scrollContainer}
+                refreshControl={
+                    <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+                }
+            >
                 <View style={styles.form}>
                     <View style={styles.titleContainer}>
                         <View style={styles.dot} />
@@ -122,7 +142,6 @@ const SignupForm = ({ navigation }) => {
                             selectedValue={selectedClass}
                             style={styles.picker}
                             onValueChange={(itemValue) => setSelectedClass(itemValue)}
-                             // Placeholder for Picker
                         >
                             <Picker.Item label="Select Class" value="" />
                             <Picker.Item label="TI11" value="TI11" />
@@ -247,57 +266,52 @@ const styles = StyleSheet.create({
         padding: 15, // Increased padding for comfort
         paddingTop: 20,
         borderWidth: 1,
-        borderColor: 'rgba(105, 105, 105, 0.397)',
+        borderColor: 'rgba(105, 105, 105, 0.7)',
         borderRadius: 10,
         fontSize: 16,
-        color: 'black',
-        backgroundColor: '#f9f9f9', // Background color for input
-    },
-    picker: {
-        width: '100%',
-        padding: 15, // Match the input field padding
-        borderWidth: 1,
-        borderColor: 'rgba(105, 105, 105, 0.397)',
-        borderRadius: 10,
-        backgroundColor: '#f9f9f9', // Background color for Picker
+        backgroundColor: '#f7f7f7',
     },
     label: {
         position: 'absolute',
         left: 15,
         top: 15,
-        color: 'grey',
         fontSize: 16,
-        fontWeight: '600',
-        transition: '0.2s',
+        color: 'gray',
         backgroundColor: '#fff',
         paddingHorizontal: 5,
+        transition: 'all 0.3s ease-in-out',
     },
     labelFocused: {
         top: -5,
         left: 10,
-        color: 'royalblue',
         fontSize: 12,
+        color: 'royalblue',
+        fontWeight: '600',
     },
     submit: {
         backgroundColor: 'royalblue',
-        paddingVertical: 15,
+        padding: 15,
         borderRadius: 10,
-        marginTop: 10,
         alignItems: 'center',
+        marginTop: 20,
     },
     submitText: {
-        color: 'white',
-        fontSize: 16,
+        color: '#fff',
+        fontSize: 18,
         fontWeight: '600',
     },
     signin: {
         textAlign: 'center',
         marginTop: 15,
-        color: 'rgba(88, 87, 87, 0.822)',
+        color: 'gray',
     },
     signinLink: {
         color: 'royalblue',
         fontWeight: '600',
+    },
+    picker: {
+        height: 50,
+        width: '100%',
     },
 });
 
