@@ -4,27 +4,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 
 const Profile = () => {
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [firstname, setFirstname] = useState('');
-    const [lastname, setLastname] = useState('');
-    const [email, setEmail] = useState('');
-    const [profilePhoto, setProfilePhoto] = useState(null);
+  const [user, setUser] = useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+  });
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-                const response = await fetch('http://192.168.232.123:4000/api/profile', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [loading, setLoading] = useState(true);
+
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch('http://192.168.9.123:3000/api/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
                 const jsonResponse = await response.json();
                 if (jsonResponse.success) {

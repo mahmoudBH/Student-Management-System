@@ -12,8 +12,7 @@ import Profile from './components/Profile';
 import MesNotes from './components/MesNotes';
 import MesCours from './components/MesCours';
 import Contact from './components/Contact';
-import Support from './components/Support'; // Import Support component
-import axios from 'axios'; // Import axios for API requests
+import Support from './components/Support'; 
 
 const Drawer = createDrawerNavigator();
 

@@ -147,7 +147,7 @@ const Home = () => {
             )}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, backgroundColor: '#f7f9fc' },
@@ -158,5 +158,5 @@ const styles = StyleSheet.create({
     notificationText: { fontSize: 16, fontWeight: '500', color: '#0d47a1' },
     errorText: { color: 'red', textAlign: 'center', marginTop: 20 },
 });
-
+}
 export default Home;
