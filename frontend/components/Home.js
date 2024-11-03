@@ -21,7 +21,7 @@ const Home = () => {
                 }
 
                 const classId = await AsyncStorage.getItem('class');
-                const responseNotes = await fetch('http://192.168.232.123:4000/api/check-new-notes', {
+                const responseNotes = await fetch('http://192.168.228.100:4000/api/check-new-notes', {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -29,7 +29,7 @@ const Home = () => {
                     },
                 });
 
-                const responseCourses = await fetch(`http://192.168.232.123:4000/api/check-new-courses?classId=${classId}`, {
+                const responseCourses = await fetch(`http://192.168.228.100:4000/api/check-new-courses?classId=${classId}`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ const Home = () => {
     const markCourseAsViewed = async (courseId) => {
         try {
             const token = await AsyncStorage.getItem('token');
-            const response = await fetch(`http://192.168.232.123:4000/api/mark-course-viewed/${courseId}`, {
+            const response = await fetch(`http://192.168.228.100:4000/api/mark-course-viewed/${courseId}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -87,7 +87,7 @@ const Home = () => {
     const markNoteAsViewed = async (noteId) => {
         try {
             const token = await AsyncStorage.getItem('token');
-            const response = await fetch(`http://192.168.232.123:4000/api/mark-note-viewed/${noteId}`, {
+            const response = await fetch(`http://192.168.228.100:4000/api/mark-note-viewed/${noteId}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -147,7 +147,7 @@ const Home = () => {
             )}
         </View>
     );
-});
+};
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, backgroundColor: '#f7f9fc' },
@@ -158,5 +158,5 @@ const styles = StyleSheet.create({
     notificationText: { fontSize: 16, fontWeight: '500', color: '#0d47a1' },
     errorText: { color: 'red', textAlign: 'center', marginTop: 20 },
 });
-}
+
 export default Home;

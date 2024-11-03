@@ -10,7 +10,7 @@ const MesNotes = () => {
             try {
                 const token = await AsyncStorage.getItem('token'); // Retrieve token from storage
 
-                const response = await fetch('http://192.168.232.123:4000/api/mesnotes', {
+                const response = await fetch('http://192.168.228.100:4000/api/mesnotes', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

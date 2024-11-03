@@ -4,28 +4,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 
 const Profile = () => {
-  const [user, setUser] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-  });
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [firstname, setFirstname] = useState('');
+    const [lastname, setLastname] = useState('');
+    const [email, setEmail] = useState('');
+    const [profilePhoto, setProfilePhoto] = useState(null);
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  
-  const [loading, setLoading] = useState(true);
-
-  const fetchUserData = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await fetch('http://192.168.9.123:3000/api/profile', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                const response = await fetch('http://192.168.228.100:4000/api/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
                 const jsonResponse = await response.json();
                 if (jsonResponse.success) {
@@ -48,7 +47,7 @@ const Profile = () => {
 
     const handleUpdate = async () => {
         const token = await AsyncStorage.getItem('token');
-        const response = await fetch('http://192.168.232.123:4000/api/profile', {
+        const response = await fetch('http://192.168.228.100:4000/api/profile', {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -72,7 +71,7 @@ const Profile = () => {
         }
 
         const token = await AsyncStorage.getItem('token');
-        const response = await fetch('http://192.168.232.123:4000/api/change-password', {
+        const response = await fetch('http://192.168.228.100:4000/api/change-password', {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -116,7 +115,7 @@ const Profile = () => {
                 type: 'image/jpeg',
             });
 
-            const uploadResponse = await fetch('http://192.168.232.123:4000/api/upload-photo', {
+            const uploadResponse = await fetch('http://192.168.228.100:4000/api/upload-photo', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

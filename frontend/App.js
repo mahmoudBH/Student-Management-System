@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,22 +12,64 @@ import Profile from './components/Profile';
 import MesNotes from './components/MesNotes';
 import MesCours from './components/MesCours';
 import Contact from './components/Contact';
-import Support from './components/Support'; 
+import Support from './components/Support';
 
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = (props) => {
+const CustomDrawerContent = ({ setIsLoggedIn, ...props }) => {
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const fetchUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        const response = await fetch('http://192.168.228.100:4000/api/profile', {
+          method: 'GET', // Utiliser la méthode GET
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        if (data.success) {
+          // Mise à jour des états avec les données reçues
+          setProfilePhoto(data.data.profile_photo);
+          setFirstName(data.data.firstname);
+          setLastName(data.data.lastname);
+        } else {
+          // Déconnexion si la récupération échoue
+          await AsyncStorage.multiRemove(['token', 'firstname', 'lastname', 'profile_photo']);
+          setIsLoggedIn(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+  
+  
+
+  useEffect(() => {
+    fetchUserData();
+  }, []); // Le tableau vide signifie que cela s'exécute uniquement au montage
+
   return (
     <View style={styles.drawerContent}>
-      <Text style={styles.drawerHeader}>My App</Text>
+      {profilePhoto && (
+        <Image
+          source={{ uri: profilePhoto }}
+          style={styles.profilePhoto}
+        />
+      )}
+      <Text style={styles.userName}>{firstName} {lastName}</Text>
       <DrawerItemList {...props} />
     </View>
   );
 };
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
-  const [unreadCount, setUnreadCount] = useState(0); // State to track unread notifications
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const checkLoginStatus = async () => {
     try {
@@ -38,31 +80,9 @@ const App = () => {
     }
   };
 
-  const fetchUnreadNotifications = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await axios.get('http://192.168.232.123:4000/api/unread-notifications', {
-        headers: {
-          Authorization: token,
-        },
-      });
-
-      // Assuming response.data.notifications returns an array of notifications
-      const notifications = response.data.notifications;
-      if (notifications) {
-        setUnreadCount(notifications.length);
-      }
-    } catch (error) {
-      console.error('Error fetching unread notifications:', error);
-    }
-  };
-
   useEffect(() => {
     checkLoginStatus();
-    if (isLoggedIn) {
-      fetchUnreadNotifications(); // Fetch unread notifications if logged in
-    }
-  }, [isLoggedIn]);
+  }, []);
 
   return (
     <NavigationContainer>
@@ -70,23 +90,26 @@ const App = () => {
         initialRouteName="Login"
         screenOptions={{
           drawerStyle: {
-            backgroundColor: '#f4f4f4',
-            width: 240,
+            backgroundColor: '#E3F2FD', // Fond bleu clair du drawer
+            width: 280,
           },
           drawerLabelStyle: {
             fontSize: 16,
             fontWeight: 'bold',
-            color: '#333',
+            color: '#1A237E', // Couleur bleu foncé des labels
           },
+          drawerActiveBackgroundColor: '#BBDEFB', // Fond bleu clair de l'élément actif
+          drawerActiveTintColor: '#0D47A1', // Couleur bleu foncé de texte de l'élément actif
+          drawerInactiveTintColor: '#1A237E', // Couleur bleu foncé des éléments inactifs
           headerStyle: {
-            backgroundColor: '#6200ee',
+            backgroundColor: '#0D47A1', // Fond bleu foncé de l'en-tête
           },
-          headerTintColor: '#fff',
+          headerTintColor: '#FFF', // Couleur du texte blanc de l'en-tête
           headerTitleStyle: {
             fontWeight: 'bold',
           },
         }}
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        drawerContent={(props) => <CustomDrawerContent {...props} setIsLoggedIn={setIsLoggedIn} />}
       >
         {!isLoggedIn ? (
           <>
@@ -101,7 +124,6 @@ const App = () => {
             >
               {(props) => <Login {...props} setIsLoggedIn={setIsLoggedIn} />}
             </Drawer.Screen>
-
             <Drawer.Screen
               name="SignupForm"
               component={SignupForm}
@@ -167,7 +189,7 @@ const App = () => {
               }}
             />
             <Drawer.Screen
-              name="Support"  // Adding Support page under Contact
+              name="Support"
               component={Support}
               options={{
                 title: 'Support',
@@ -190,16 +212,6 @@ const App = () => {
           </>
         )}
       </Drawer.Navigator>
-
-      {/* Notification Indicator */}
-      {isLoggedIn && (
-        <View style={styles.notificationContainer}>
-          <MaterialCommunityIcons name="bell" size={24} color="#6200ee" />
-          {unreadCount > 0 && (
-            <Text style={styles.notificationCount}>{unreadCount}</Text>
-          )}
-        </View>
-      )}
     </NavigationContainer>
   );
 };
@@ -209,39 +221,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffff', // Fond bleu clair du drawer
   },
-  drawerHeader: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6200ee',
+  profilePhoto: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+    alignSelf: 'center',
+    borderColor: '#1A237E', // Couleur bleu foncé de bordure pour la photo
+    borderWidth: 2,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0D47A1', // Couleur bleu foncé du texte pour le nom
+    textAlign: 'center',
     marginBottom: 20,
-  },
-  notificationContainer: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 8,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 5,
-  },
-  notificationCount: {
-    backgroundColor: 'red',
-    color: 'white',
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: 5,
   },
 });
 

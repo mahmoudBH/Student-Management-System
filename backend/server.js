@@ -13,12 +13,11 @@ const port = 4000;
 
 // Middleware configuration
 app.use(cors({
-    origin: 'http://192.168.232.123:4000:8082',
+    origin: 'http://192.168.228.100:4000:8081',
     credentials: true,
 }));
 app.use(bodyParser.json());
 app.use(express.json());
-
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -204,7 +203,7 @@ app.get('/api/profile', authenticateToken, (req, res) => {
 
         const user = results[0];
         // Create the complete URL for the profile photo
-        user.profile_photo = user.profile_photo ? `http://192.168.232.123:4000/uploads/${user.profile_photo}` : null;
+        user.profile_photo = user.profile_photo ? `http://192.168.228.100:4000/uploads/${user.profile_photo}` : null;
 
         return res.status(200).json({ success: true, data: user });
     });
@@ -305,7 +304,7 @@ app.get('/api/mescours', authenticateToken, (req, res) => {
         if (userResult.length === 0) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
 
         const userClass = userResult[0].class;
-        const sql = 'SELECT *, CONCAT("http://192.168.232.123:4000/uploads/", pdf_path) AS fileUrl FROM cours WHERE classe = ?';
+        const sql = 'SELECT *, CONCAT("http://192.168.228.100:4000/uploads/", pdf_path) AS fileUrl FROM cours WHERE classe = ?';
         db.query(sql, [userClass], (err, results) => {
             if (err) return res.status(500).json({ success: false, message: 'Erreur lors de la récupération des cours.' });
             res.json(results);

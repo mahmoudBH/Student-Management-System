@@ -5,9 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Logout = ({ setIsLoggedIn }) => {
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://192.168.232.123:4000/api/logout', {
+      const response = await fetch('http://192.168.228.100:4000/api/logout', {
         method: 'POST',
-        credentials: 'include', // Include cookies for session logout
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -17,16 +17,31 @@ const Logout = ({ setIsLoggedIn }) => {
       const data = await response.json();
 
       if (data.success) {
-        // Remove token from AsyncStorage
-        await AsyncStorage.removeItem('token');
+        // Remove token and user details from AsyncStorage
+        await AsyncStorage.multiRemove(['token', 'firstname', 'lastname', 'profile_photo']);
         Alert.alert('Succès', 'Déconnexion réussie!');
         setIsLoggedIn(false); // Update login state to false
+
+        // Call checkAsyncStorage to verify removal
+        checkAsyncStorage();
       } else {
         Alert.alert('Erreur', data.message);
       }
     } catch (error) {
       Alert.alert('Erreur', error.message || 'Une erreur est survenue.');
       console.error('Logout Error:', error);
+    }
+  };
+
+  // Function to check AsyncStorage values
+  const checkAsyncStorage = async () => {
+    try {
+      const firstname = await AsyncStorage.getItem('firstname');
+      const lastname = await AsyncStorage.getItem('lastname');
+      const profile_photo = await AsyncStorage.getItem('profile_photo');
+
+    } catch (error) {
+      console.error('Erreur lors de la lecture d\'AsyncStorage:', error);
     }
   };
 
