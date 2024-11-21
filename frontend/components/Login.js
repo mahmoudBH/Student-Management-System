@@ -4,24 +4,34 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
-const Login = ({ navigation, setIsLoggedIn }) => {
+const Login = ({ setIsLoggedIn }) => {
     const pulseAnim = new Animated.Value(1);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [focusedInput, setFocusedInput] = useState({});
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isLoggedIn, setIsLoggedInState] = useState(false);  // New state to track login status
 
     useEffect(() => {
         const animationLoop = Animated.loop(
-            Animated.sequence([
+            Animated.sequence([ 
                 Animated.timing(pulseAnim, { toValue: 1.8, duration: 1000, useNativeDriver: true }),
                 Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
             ])
         );
         animationLoop.start();
-
         return () => animationLoop.stop();
     }, [pulseAnim]);
+
+    useEffect(() => {
+        const checkLogin = async () => {
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                setIsLoggedInState(true);  // Update the state to reflect that the user is logged in
+            }
+        };
+        checkLogin();
+    }, []);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -30,7 +40,7 @@ const Login = ({ navigation, setIsLoggedIn }) => {
         }
 
         try {
-            const response = await fetch('http://192.168.228.100:4000/api/login', {
+            const response = await fetch('http://192.168.32.100:4000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,13 +63,10 @@ const Login = ({ navigation, setIsLoggedIn }) => {
                 if (data.user.profile_photo) {
                     await AsyncStorage.setItem('profile_photo', data.user.profile_photo);
                 }
-                Alert.alert('Succès', 'Connexion réussie!');
 
+                Alert.alert('Succès', 'Connexion réussie!');
                 setIsLoggedIn(true);
-                navigation.navigate('Home', {
-                    firstname: data.user.firstname,
-                    lastname: data.user.lastname,
-                });
+                setIsLoggedInState(true);  // Set login state to true after successful login
             } else {
                 Alert.alert('Erreur', 'Email ou mot de passe incorrect.');
             }
@@ -75,8 +82,7 @@ const Login = ({ navigation, setIsLoggedIn }) => {
         setEmail('');
         setPassword('');
         setFocusedInput({});
-        
-        // Simulate a refresh action with a timeout
+
         setTimeout(() => {
             setIsRefreshing(false);
         }, 1000); // Adjust the duration as needed
@@ -140,12 +146,19 @@ const Login = ({ navigation, setIsLoggedIn }) => {
                         Don’t have an account?{' '}
                         <Text
                             style={styles.link}
-                            onPress={() => navigation.navigate('SignupForm')}
+                            // No navigation, you can handle this manually if needed
                         >
                             Sign Up
                         </Text>
                     </Text>
                 </View>
+
+                {/* Conditionally render Home page or a message based on login status */}
+                {isLoggedIn && (
+                    <View style={styles.loggedInMessage}>
+                        <Text style={styles.loggedInText}>Vous êtes connecté!</Text>
+                    </View>
+                )}
             </ScrollView>
         </View>
     );
@@ -250,6 +263,17 @@ const styles = StyleSheet.create({
     link: {
         color: 'royalblue',
         textDecorationLine: 'underline',
+    },
+    loggedInMessage: {
+        padding: 20,
+        backgroundColor: '#d4f8e8',
+        borderRadius: 10,
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    loggedInText: {
+        fontSize: 18,
+        color: 'green',
     },
 });
 

@@ -16,7 +16,7 @@ import Support from './components/Support';
 
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = ({ setIsLoggedIn, refreshData, ...props }) => {
+const CustomDrawerContent = ({ setIsLoggedIn, refreshData, isLoggedIn, ...props }) => {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -25,7 +25,7 @@ const CustomDrawerContent = ({ setIsLoggedIn, refreshData, ...props }) => {
     try {
       const token = await AsyncStorage.getItem('token');
       if (token) {
-        const response = await fetch('http://192.168.228.100:4000/api/profile', {
+        const response = await fetch('http://192.168.32.100:4000/api/profile', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,25 +47,41 @@ const CustomDrawerContent = ({ setIsLoggedIn, refreshData, ...props }) => {
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, [refreshData]);
+    if (isLoggedIn) {
+      fetchUserData();
+    }
+  }, [refreshData, isLoggedIn]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserData();
-    }, [refreshData])
+      if (isLoggedIn) {
+        fetchUserData();
+      }
+    }, [refreshData, isLoggedIn])
   );
 
   return (
     <View style={styles.drawerContent}>
-      {profilePhoto && (
+      {isLoggedIn ? (
+        <>
+          {profilePhoto && (
+            <Image
+              source={{ uri: profilePhoto }}
+              style={styles.profilePhoto}
+            />
+          )}
+          <Text style={styles.userName}>{firstName} {lastName}</Text>
+        </>
+      ) : (
         <Image
-          source={{ uri: profilePhoto }}
-          style={styles.profilePhoto}
+          source={require('./assets/digital-student.png')}
+          style={styles.defaultLogo}
         />
       )}
-      <Text style={styles.userName}>{firstName} {lastName}</Text>
       <DrawerItemList {...props} />
+      <View style={styles.copyrightContainer}>
+        <Text style={styles.copyrightText}>© 2024 Mahmoud Bousbih. Tous droits réservés.</Text>
+      </View>
     </View>
   );
 };
@@ -89,7 +105,7 @@ const App = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      setRefreshData(prev => !prev); // Trigger refresh when logged in
+      setRefreshData(prev => !prev);
     }
   }, [isLoggedIn]);
 
@@ -119,18 +135,23 @@ const App = () => {
           },
         }}
         drawerContent={(props) => (
-          <CustomDrawerContent {...props} setIsLoggedIn={setIsLoggedIn} refreshData={refreshData} />
+          <CustomDrawerContent
+            {...props}
+            setIsLoggedIn={setIsLoggedIn}
+            refreshData={refreshData}
+            isLoggedIn={isLoggedIn}
+          />
         )}
       >
         {!isLoggedIn ? (
           <>
-            <Drawer.Screen 
-              name="Login" 
-              options={{ 
-                title: 'Login', 
+            <Drawer.Screen
+              name="Login"
+              options={{
+                title: 'Login',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="login" color={color} size={20} />
-                ) 
+                ),
               }}
             >
               {(props) => <Login {...props} setIsLoggedIn={setIsLoggedIn} />}
@@ -158,7 +179,7 @@ const App = () => {
                 ),
               }}
             />
-            <Drawer.Screen 
+            <Drawer.Screen
               name="MesNotes"
               component={MesNotes}
               options={{
@@ -178,13 +199,13 @@ const App = () => {
                 ),
               }}
             />
-            <Drawer.Screen 
-              name="Profile" 
-              options={{ 
-                title: 'Profile', 
+            <Drawer.Screen
+              name="Profile"
+              options={{
+                title: 'Profile',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="account" color={color} size={20} />
-                ) 
+                ),
               }}
             >
               {(props) => <Profile {...props} setIsLoggedIn={setIsLoggedIn} setRefreshData={setRefreshData} />}
@@ -209,13 +230,13 @@ const App = () => {
                 ),
               }}
             />
-            <Drawer.Screen 
-              name="Logout" 
-              options={{ 
-                title: 'Logout', 
+            <Drawer.Screen
+              name="Logout"
+              options={{
+                title: 'Logout',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="logout" color={color} size={20} />
-                ) 
+                ),
               }}
             >
               {() => <Logout setIsLoggedIn={setIsLoggedIn} />}
@@ -232,16 +253,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     paddingHorizontal: 16,
-    backgroundColor: '#ffff',
+    backgroundColor: '#fff',
   },
   profilePhoto: {
-    width: 100, // Augmenté à 100
-    height: 100, // Augmenté à 100
-    borderRadius: 50, // Ajusté pour correspondre à la nouvelle taille
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginBottom: 10,
     alignSelf: 'center',
     borderColor: '#1A237E',
     borderWidth: 2,
+  },
+  defaultLogo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   userName: {
     fontSize: 22,
@@ -249,6 +276,17 @@ const styles = StyleSheet.create({
     color: '#0D47A1',
     textAlign: 'center',
     marginBottom: 20,
+  },
+  copyrightContainer: {
+    marginTop: 'auto',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderColor: '#E0E0E0',
+    alignItems: 'center',
+  },
+  copyrightText: {
+    fontSize: 12,
+    color: '#757575',
   },
 });
 

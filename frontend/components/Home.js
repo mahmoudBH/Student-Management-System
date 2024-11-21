@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Alert, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, Alert, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the icon library
 
 const Home = () => {
     const [notes, setNotes] = useState([]);
     const [courses, setCourses] = useState([]);
     const [error, setError] = useState('');
-    const [refreshing, setRefreshing] = useState(false); // State for refresh control
     const navigation = useNavigation();
     const isFocused = useIsFocused();
 
     // Fetch data when the component mounts or when the screen refocuses
     const fetchData = async () => {
         try {
-            setRefreshing(true); // Start refreshing
             const token = await AsyncStorage.getItem('token');
             if (!token) {
                 Alert.alert('Error', 'No token found. Please log in again.');
@@ -23,7 +20,7 @@ const Home = () => {
             }
 
             const classId = await AsyncStorage.getItem('class');
-            const responseNotes = await fetch('http://192.168.228.100:4000/api/check-new-notes', {
+            const responseNotes = await fetch('http://192.168.32.100:4000/api/check-new-notes', {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -31,7 +28,7 @@ const Home = () => {
                 },
             });
 
-            const responseCourses = await fetch(`http://192.168.228.100:4000/api/check-new-courses?classId=${classId}`, {
+            const responseCourses = await fetch(`http://192.168.32.100:4000/api/check-new-courses?classId=${classId}`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -55,8 +52,6 @@ const Home = () => {
             console.error('Error fetching data:', error);
             setError('Could not fetch data.');
             Alert.alert('Error', 'Could not fetch data, please try again later.');
-        } finally {
-            setRefreshing(false); // Stop refreshing
         }
     };
 
@@ -64,16 +59,12 @@ const Home = () => {
         if (isFocused) fetchData(); // Fetch data when focused
     }, [isFocused]);
 
-    const onRefresh = () => {
-        fetchData(); // Fetch data on pull-to-refresh
-    };
-
     const markCourseAsViewed = async (courseId) => {
-        // Your existing function...
+        // Your existing function to mark course as viewed
     };
 
     const markNoteAsViewed = async (noteId) => {
-        // Your existing function...
+        // Your existing function to mark note as viewed
     };
 
     const renderNotification = ({ item }) => (
@@ -110,15 +101,6 @@ const Home = () => {
                     renderItem={renderNotification}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.notificationList}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            colors={['#6200ee']} // Custom color for the refresh control
-                            progressBackgroundColor="#f7f9fc" // Background color for the refresh control
-                            tintColor="#6200ee" // Color of the spinner
-                        />
-                    }
                 />
             )}
         </View>

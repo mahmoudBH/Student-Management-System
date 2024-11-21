@@ -10,7 +10,7 @@ const MesCours = () => {
     const fetchCours = async () => {
         try {
             const token = await AsyncStorage.getItem('token');
-            const response = await fetch('http://192.168.228.100:4000/api/mescours', {
+            const response = await fetch('http://192.168.32.100:4000/api/mescours', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -59,7 +59,7 @@ const MesCours = () => {
     };
 
     const renderCourse = ({ item }) => (
-        <TouchableOpacity onPress={() => handleDownload(`http://192.168.228.100:4000/${item.pdf_path}`)}>
+        <TouchableOpacity onPress={() => handleDownload(`http://192.168.32.100:4000/${item.pdf_path}`)}>
             <View style={styles.courseItem}>
                 <Text style={styles.courseTitle}>{item.matiere}</Text>
                 <Text style={styles.courseDescription}>Class: {item.classe}</Text>

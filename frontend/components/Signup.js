@@ -38,7 +38,7 @@ const SignupForm = ({ navigation }) => {
 
         const data = { firstname, lastname, email, password, class: selectedClass };
 
-        fetch('http://192.168.228.100:4000/api/signup', {
+        fetch('http://192.168.32.100:4000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

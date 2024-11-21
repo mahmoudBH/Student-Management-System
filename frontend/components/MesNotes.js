@@ -9,7 +9,7 @@ const MesNotes = () => {
     const fetchNotes = async () => {
         try {
             const token = await AsyncStorage.getItem('token');
-            const response = await fetch('http://192.168.228.100:4000/api/mesnotes', {
+            const response = await fetch('http://192.168.32.100:4000/api/mesnotes', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -50,9 +50,10 @@ const MesNotes = () => {
     );
 
     const getGradeStyle = (grade) => {
-        if (grade >= 16) return { backgroundColor: '#4CAF50' };
-        if (grade >= 12) return { backgroundColor: '#FFC107' };
-        return { backgroundColor: '#F44336' };
+        if (grade >= 16) return { backgroundColor: '#4CAF50' }; // Green for good grades (16-20)
+        if (grade >= 11) return { backgroundColor: '#FFEB3B' }; // Yellow for average grades (11-15)
+        if (grade >= 6) return { backgroundColor: '#FF9800' }; // Orange for passable grades (6-10)
+        return { backgroundColor: '#F44336' }; // Red for low grades (0-5)
     };
 
     return (
