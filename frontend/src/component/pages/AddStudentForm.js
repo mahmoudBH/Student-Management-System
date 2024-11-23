@@ -1,8 +1,7 @@
-// ./components/AddStudentForm.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../Header'; // Assurez-vous que le chemin d'importation est correct
-import './AddStudentForm.css'; // Assurez-vous que le fichier de style est importé
+import Header from '../Header';
+import styled from 'styled-components';
 
 const AddStudentForm = () => {
   const [formData, setFormData] = useState({
@@ -10,10 +9,10 @@ const AddStudentForm = () => {
     lastname: '',
     note: '',
     class: 'TI11',
-    matiere: 'developpement web', // Valeur par défaut
+    matiere: 'developpement web',
   });
-  const [message, setMessage] = useState(''); // État pour afficher le message de succès ou d'erreur
-  const [isError, setIsError] = useState(false); // État pour indiquer si c'est une erreur
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
   // Vérifier la session utilisateur
@@ -22,10 +21,9 @@ const AddStudentForm = () => {
       try {
         const response = await fetch('http://localhost:5000/api/check-session', {
           method: 'GET',
-          credentials: 'include', // Permet d'envoyer les cookies pour vérifier la session
+          credentials: 'include',
         });
         if (response.status !== 200) {
-          // Redirige vers la page de connexion si la session est invalide
           navigate('/');
         }
       } catch (error) {
@@ -53,7 +51,6 @@ const AddStudentForm = () => {
         body: JSON.stringify(formData),
       });
       
-
       const data = await response.json();
 
       if (response.ok) {
@@ -64,7 +61,7 @@ const AddStudentForm = () => {
           lastname: '',
           note: '',
           class: '',
-          matiere: '', // Réinitialisation de la matière
+          matiere: '',
         });
       } else {
         setMessage(data.error || "Erreur lors de l'ajout de l'étudiant");
@@ -77,13 +74,13 @@ const AddStudentForm = () => {
   };
 
   return (
-    <div className="student-form-container">
-      <Header /> {/* Ajout du composant Header */}
-      
-      <form className='form-note' onSubmit={handleSubmit}>
-      <h2 className="form-title">Add Student Note</h2> {/* Title added */}
+    <Container>
+      <Header /> 
+
+      <Form onSubmit={handleSubmit}>
+        <h2>Ajouter la note de l'étudiant</h2>
         <div>
-          <label>First Name:</label>
+          <label>Prénom :</label>
           <input
             type="text"
             name="firstname"
@@ -93,7 +90,7 @@ const AddStudentForm = () => {
           />
         </div>
         <div>
-          <label>Last Name:</label>
+          <label>Nom :</label>
           <input
             type="text"
             name="lastname"
@@ -103,7 +100,7 @@ const AddStudentForm = () => {
           />
         </div>
         <div>
-          <label>Note:</label>
+          <label>Note :</label>
           <input
             type="number"
             name="note"
@@ -113,7 +110,7 @@ const AddStudentForm = () => {
           />
         </div>
         <div>
-          <label>Class:</label>
+          <label>Classe :</label>
           <select name="class" value={formData.class} onChange={handleChange} required>
             <option value="TI11">TI11</option>
             <option value="TI12">TI12</option>
@@ -126,7 +123,7 @@ const AddStudentForm = () => {
           </select>
         </div>
         <div>
-          <label>Matière:</label>
+          <label>Matière :</label>
           <select name="matiere" value={formData.matiere} onChange={handleChange} required>
             <option value="developpement web">Développement Web</option>
             <option value="JAVA">JAVA</option>
@@ -136,17 +133,105 @@ const AddStudentForm = () => {
             <option value="English">English</option>
           </select>
         </div>
-        <button type="submit" className='add-student'>Add</button>
-      </form>
+        <button type="submit">Ajouter</button>
+      </Form>
 
-      {/* Affichage du message */}
       {message && (
-        <p style={{ color: isError ? 'red' : 'green', marginTop: '10px' }}>
-          {message}
-        </p>
+        <Message isError={isError}>{message}</Message>
       )}
-    </div>
+    </Container>
   );
 };
 
 export default AddStudentForm;
+
+// Styled components
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px 40px 280px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  font-family: Arial, sans-serif;
+`;
+
+const Form = styled.form`
+  max-width: 500px;
+  width: 100%;
+  margin: 100px auto;
+  padding: 30px;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  border-radius: 10px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  div {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: #4a90e2;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background: #f5f5f5;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  input:focus,
+  select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+    outline: none;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #357abd;
+    box-shadow: 0 4px 10px rgba(53, 122, 189, 0.3);
+  }
+
+  button[type="submit"]:active {
+    transform: translateY(2px);
+  }
+`;
+
+const Message = styled.p`
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+  color: ${({ isError }) => (isError ? '#e74c3c' : '#27ae60')};
+`;
+

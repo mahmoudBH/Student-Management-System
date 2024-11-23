@@ -2,13 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Signup from './component/authentification/Signup';
 import Login from './component/authentification/Login';
-import Home from './component/pages/Home/Home';
-import EditNoteForm from './component/pages/EditNoteForm/EditNoteForm';
-import AddStudentForm from './component/pages/AddStudentForm/AddStudentForm';
-import AddCourseForm from './component/pages/AddCourseForm/AddCourseForm';
+import Home from './component/pages/Home';
+import EditNoteForm from './component/pages/EditNoteForm';
+import AddStudentForm from './component/pages/AddStudentForm';
+import AddCourseForm from './component/pages/AddCourseForm';
 import Profile from './component/pages/Profile/Profile';
-import ManageStudent from './component/pages/ManageStudent/ManageStudent';
-import Message from './component/pages/Message/Message';
+import ManageStudent from './component/pages/ManageStudent';
+import Message from './component/pages/Message';
 
 function App() {
   return (

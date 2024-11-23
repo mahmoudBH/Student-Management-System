@@ -1,8 +1,8 @@
 // ./components/AddCourseForm.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../Header';
-import './AddCourseForm.css';
+import Header from '../Header';
+import styled from 'styled-components';
 
 const AddCourseForm = () => {
   const [formValues, setFormValues] = useState({
@@ -73,9 +73,9 @@ const AddCourseForm = () => {
   };
 
   return (
-    <div className="course-container">
+    <CourseContainer>
       <Header /> {/* Include Header component */}
-      <form className='form-cour' onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <h2>Ajouter un Cours</h2>
 
         <div>
@@ -112,9 +112,109 @@ const AddCourseForm = () => {
         </div>
 
         <button type="submit" className='add-cours'>Ajouter le Cours</button>
-      </form>
-    </div>
+      </Form>
+    </CourseContainer>
   );
 };
+
+const CourseContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 20px 260px; /* Reduced top padding to bring it higher */
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+`;
+
+const Form = styled.form`
+  max-width: 500px;
+  width: 100%;
+  margin-top: 60px; /* Centered vertically on the page, higher for better visibility */
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #2c3e50;
+    font-weight: bold;
+  }
+
+  div {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: #4a90e2;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+
+  select,
+  input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f5f5f5;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  select:focus,
+  input[type="file"]:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+    outline: none;
+  }
+
+  .add-cours {
+    width: 100%;
+    padding: 14px;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .add-cours:hover {
+    background-color: #357abd;
+    box-shadow: 0 4px 10px rgba(69, 160, 73, 0.2);
+  }
+
+  .add-cours:active {
+    transform: translateY(2px);
+  }
+
+  @media screen and (max-width: 600px) {
+    padding: 20px 10px;
+    margin-top: 80px;
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .add-cours {
+      font-size: 0.9rem;
+    }
+  }
+`;
 
 export default AddCourseForm;

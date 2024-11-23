@@ -67,11 +67,15 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // Configuration de multer pour stocker les fichiers PDF avec la bonne extension
 const storagepdf = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Dossier de stockage
+    // Use the absolute path to the uploads directory
+    const uploadPath = path.join('C:', 'Users', 'mahmo', 'OneDrive', 'Bureau', 'admin-app', 'backend', 'uploads');
+    // Ensure the directory exists
+    fs.existsSync(uploadPath) || fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath); // Specify the upload path
   },
   filename: (req, file, cb) => {
     const fileExt = path.extname(file.originalname).toLowerCase();
-    cb(null, `${file.fieldname}-${Date.now()}${fileExt}`);
+    cb(null, `${file.fieldname}-${Date.now()}${fileExt}`); // Unique filename for each PDF
   },
 });
 
@@ -85,7 +89,7 @@ const pdfFilter = (req, file, cb) => {
 };
 
 // Utilisation de la configuration et du filtre avec multer
-const uploadpdf = multer({ storage: storage, fileFilter: pdfFilter });
+const uploadpdf = multer({ storage: storagepdf, fileFilter: pdfFilter });
 
 
 
@@ -233,54 +237,45 @@ app.put('/api/note/:id', sessionCheck, (req, res) => {
 // Endpoint to add a new course with PDF upload (protected by sessionCheck)
 app.post('/api/cours', sessionCheck, uploadpdf.single('pdfFile'), (req, res) => {
   const { matiere, classe } = req.body;
-  const pdfPath = req.file.path;
+  const pdfPath = req.file.path; // Path to the uploaded PDF file
 
-  // Read the PDF file as binary data
-  fs.readFile(pdfPath, (err, data) => {
+  // Insert course details into the database
+  const query = 'INSERT INTO cours (matiere, classe, pdf_path) VALUES (?, ?, ?)';
+  
+  db.query(query, [matiere, classe, pdfPath], (err, result) => {
     if (err) {
-      console.error('Erreur lors de la lecture du fichier PDF:', err);
-      res.status(500).json({ message: 'Erreur lors de la lecture du fichier PDF' });
-      return;
+      console.error("Error adding course:", err);
+      res.status(500).json({ message: "Error adding course" });
+    } else {
+      res.status(200).json({ message: "Course added successfully" });
     }
-
-    const query = 'INSERT INTO cours (matiere, classe, pdf_content) VALUES (?, ?, ?)';
-    
-    db.query(query, [matiere, classe, data], (err, result) => {
-      if (err) {
-        console.error("Erreur lors de l'ajout du cours:", err);
-        res.status(500).json({ message: "Erreur lors de l'ajout du cours" });
-      } else {
-        res.status(200).json({ message: "Cours ajouté avec succès" });
-      }
-
-      // Optionally delete the PDF file from the server after uploading to DB
-      fs.unlink(pdfPath, (unlinkErr) => {
-        if (unlinkErr) console.error('Erreur lors de la suppression du fichier PDF:', unlinkErr);
-      });
-    });
   });
 });
 
+// Endpoint to download the PDF of a course
 app.get('/api/cours/:id/pdf', (req, res) => {
   const courseId = req.params.id;
 
   const query = 'SELECT pdf_path FROM cours WHERE id = ?';
   db.query(query, [courseId], (err, results) => {
     if (err) {
-      console.error('Erreur lors de la récupération du PDF:', err);
-      return res.status(500).json({ message: 'Erreur lors de la récupération du PDF' });
+      console.error('Error fetching PDF:', err);
+      return res.status(500).json({ message: 'Error fetching PDF' });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({ message: 'PDF introuvable pour le cours spécifié' });
+      return res.status(404).json({ message: 'PDF not found for the specified course' });
     }
 
-    const pdfBuffer = results[0].pdf_path;
+    const pdfPath = results[0].pdf_path;
 
-    // Set the headers to download the file as a PDF
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="cours.pdf"');
-    res.send(pdfBuffer);
+    // Serve the PDF file for download
+    res.sendFile(path.resolve(pdfPath), (err) => {
+      if (err) {
+        console.error('Error sending PDF file:', err);
+        res.status(500).json({ message: 'Error sending PDF file' });
+      }
+    });
   });
 });
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../Header';
-import './EditNoteForm.css';
+import Header from '../Header';
 
 const EditNoteForm = () => {
   const navigate = useNavigate();
@@ -194,6 +193,87 @@ const EditNoteForm = () => {
           )}
         </tbody>
       </table>
+      <style>
+        {`
+          .notes-table {
+            width: 80%;
+            max-width: 900px;
+            margin: 90px auto;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+          }
+
+          .notes-table thead {
+            background-color: #4a90e2;
+            color: #ffffff;
+          }
+
+          .notes-table thead th {
+            padding: 12px;
+            text-align: left;
+            font-size: 1rem;
+          }
+
+          .notes-table tbody tr {
+            transition: background-color 0.3s ease;
+          }
+
+          .notes-table tbody tr:nth-child(even) {
+            background-color: #f1f1f1;
+          }
+
+          .notes-table tbody tr:hover {
+            background-color: #e6f2ff;
+          }
+
+          .notes-table td {
+            padding: 10px;
+            font-size: 0.9rem;
+            color: #333333;
+          }
+
+          .notes-table td button {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+          }
+
+          .notes-table td button:hover {
+            background-color: #4a90e2;
+            color: #ffffff;
+          }
+
+          .notes-table td input[type="text"],
+          .notes-table td input[type="number"],
+          .notes-table td select {
+            padding: 8px;
+            width: 100%;
+            font-size: 0.9rem;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+          }
+
+          .notes-table td input:focus,
+          .notes-table td select:focus {
+            outline: none;
+            border-color: #4a90e2;
+          }
+
+          h2 {
+            color: #4a90e2;
+            text-align: center;
+            font-size: 1.5rem;
+          }
+        `}
+      </style>
     </div>
   );
 };

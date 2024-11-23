@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './styles.css'; // Réutiliser le même CSS que pour la page d'inscription
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,30 +14,30 @@ const Login = () => {
         email,
         password,
       }, {
-        withCredentials: true, // Inclure les cookies de session dans la requête
+        withCredentials: true, // Include session cookies in the request
       });
 
-      // Vérifiez si la réponse contient des données utilisateur
+      // Check if the response contains user data
       if (response.data.user) {
-        // Stocker les données utilisateur dans le local storage
+        // Store user data in local storage
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        setMessage('Connexion réussie');
-        window.location.href = '/home'; // Ou utilisez navigate('/home') si vous utilisez react-router
+        setMessage('Login successful');
+        window.location.href = '/home'; // Or use navigate('/home') if using react-router
       } else {
-        setMessage('Identifiants invalides.'); // Message d'erreur en cas de problème
+        setMessage('Invalid credentials.');
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        setMessage(error.response.data.message || 'Erreur lors de la connexion.');
+        setMessage(error.response.data.message || 'Error logging in.');
       } else {
-        setMessage('Erreur lors de la connexion.');
+        setMessage('Error logging in.');
       }
     }
   };
 
   return (
-    <div className="container"> {/* Même conteneur pour centrer le formulaire */}
-      <form className="login-form" onSubmit={handleSubmit}> {/* Changement de className ici */}
+    <div className="container">
+      <form className="login-form" onSubmit={handleSubmit}>
         <p className="title">Login</p>
         <p className="message">Welcome back! Please enter your credentials.</p>
 
@@ -68,6 +67,139 @@ const Login = () => {
         {message && <p className="message">{message}</p>}
         <p className="signin">Don't have an account? <a href="/signup">Signup</a></p>
       </form>
+
+      <style jsx>{`
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 350px;
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 20px;
+          position: relative;
+        }
+
+        .container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background-color: #f0f2f5;
+        }
+
+        .title {
+          font-size: 28px;
+          color: royalblue;
+          font-weight: 600;
+          letter-spacing: -1px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding-left: 30px;
+        }
+
+        .title::before, .title::after {
+          position: absolute;
+          content: "";
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          left: 0px;
+          background-color: royalblue;
+        }
+
+        .title::before {
+          width: 18px;
+          height: 18px;
+        }
+
+        .title::after {
+          width: 18px;
+          height: 18px;
+          animation: pulse 1s linear infinite;
+        }
+
+        .message, .signin {
+          color: rgba(88, 87, 87, 0.822);
+          font-size: 14px;
+        }
+
+        .signin {
+          text-align: center;
+        }
+
+        .signin a {
+          color: royalblue;
+        }
+
+        .signin a:hover {
+          text-decoration: underline royalblue;
+        }
+
+        .login-form label {
+          position: relative;
+        }
+
+        .login-form label .input {
+          width: 90%;
+          padding: 10px 10px 20px 10px;
+          outline: 0;
+          border: 1px solid rgba(105, 105, 105, 0.397);
+          border-radius: 10px;
+        }
+
+        .login-form label .input + span {
+          position: absolute;
+          left: 10px;
+          top: 15px;
+          color: grey;
+          font-size: 0.9em;
+          cursor: text;
+          transition: 0.3s ease;
+        }
+
+        .login-form label .input:placeholder-shown + span {
+          top: 15px;
+          font-size: 0.9em;
+        }
+
+        .login-form label .input:focus + span, .login-form label .input:valid + span {
+          top: 30px;
+          font-size: 0.7em;
+          font-weight: 600;
+        }
+
+        .login-form label .input:valid + span {
+          color: green;
+        }
+
+        .submit {
+          border: none;
+          outline: none;
+          background-color: royalblue;
+          padding: 10px;
+          border-radius: 10px;
+          color: #fff;
+          font-size: 16px;
+          transform: .3s ease;
+        }
+
+        .submit:hover {
+          background-color: rgb(56, 90, 194);
+        }
+
+        @keyframes pulse {
+          from {
+            transform: scale(0.9);
+            opacity: 1;
+          }
+          to {
+            transform: scale(1.8);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
