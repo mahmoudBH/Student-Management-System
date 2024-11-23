@@ -60,25 +60,30 @@ const Home = () => {
     }, [isFocused]);
 
     const markCourseAsViewed = async (courseId) => {
-        // Your existing function to mark course as viewed
+        // Optional: Add API call to mark the course as viewed
     };
 
     const markNoteAsViewed = async (noteId) => {
-        // Your existing function to mark note as viewed
+        // Optional: Add API call to mark the note as viewed
+    };
+
+    const handleNotificationClick = (item) => {
+        // Remove the notification from the list
+        if (item.type === 'note') {
+            setNotes((prevNotes) => prevNotes.filter((note) => note.id !== item.id));
+            markNoteAsViewed(item.id);
+            navigation.navigate('MesNotes', { noteId: item.id });
+        } else {
+            setCourses((prevCourses) => prevCourses.filter((course) => course.id !== item.id));
+            markCourseAsViewed(item.id);
+            navigation.navigate('MesCours', { courseId: item.id });
+        }
     };
 
     const renderNotification = ({ item }) => (
         <TouchableOpacity
             style={styles.notificationContainer}
-            onPress={() => {
-                if (item.type === 'note') {
-                    markNoteAsViewed(item.id);
-                    navigation.navigate('MesNotes', { noteId: item.id });
-                } else {
-                    markCourseAsViewed(item.id);
-                    navigation.navigate('MesCours', { courseId: item.id });
-                }
-            }}
+            onPress={() => handleNotificationClick(item)}
         >
             <View style={styles.notification}>
                 <Text style={styles.notificationText}>

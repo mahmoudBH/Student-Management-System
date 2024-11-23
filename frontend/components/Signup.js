@@ -135,25 +135,28 @@ const SignupForm = ({ navigation }) => {
 
                     {/* Enhanced Class Picker */}
                     <View style={styles.inputContainer}>
-                        <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
-                            Class
-                        </Text>
-                        <Picker
-                            selectedValue={selectedClass}
-                            style={styles.picker}
-                            onValueChange={(itemValue) => setSelectedClass(itemValue)}
-                        >
-                            <Picker.Item label="Select Class" value="" />
-                            <Picker.Item label="TI11" value="TI11" />
-                            <Picker.Item label="TI12" value="TI12" />
-                            <Picker.Item label="TI13" value="TI13" />
-                            <Picker.Item label="TI14" value="TI14" />
-                            <Picker.Item label="DSI21" value="DSI21" />
-                            <Picker.Item label="DSI22" value="DSI22" />
-                            <Picker.Item label="DSI31" value="DSI31" />
-                            <Picker.Item label="DSI32" value="DSI32" />
-                        </Picker>
-                    </View>
+    <View style={[styles.input, styles.pickerContainer]}>
+        <Picker
+            selectedValue={selectedClass}
+            style={styles.picker}
+            onValueChange={(itemValue) => setSelectedClass(itemValue)}
+        >
+            <Picker.Item label="" value="" />
+            <Picker.Item label="TI11" value="TI11" />
+            <Picker.Item label="TI12" value="TI12" />
+            <Picker.Item label="TI13" value="TI13" />
+            <Picker.Item label="TI14" value="TI14" />
+            <Picker.Item label="DSI21" value="DSI21" />
+            <Picker.Item label="DSI22" value="DSI22" />
+            <Picker.Item label="DSI31" value="DSI31" />
+            <Picker.Item label="DSI32" value="DSI32" />
+        </Picker>
+    </View>
+    <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
+        Class
+    </Text>
+</View>
+
 
                     <View style={styles.inputContainer}>
                         <TextInput
@@ -203,7 +206,7 @@ const SignupForm = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#f9fafb', // Couleur plus claire pour le fond
     },
     scrollContainer: {
         flexGrow: 1,
@@ -214,26 +217,28 @@ const styles = StyleSheet.create({
     form: {
         width: '100%',
         maxWidth: 400,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         padding: 20,
-        borderRadius: 20,
+        borderRadius: 15,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 10,
         elevation: 5,
+        borderWidth: 1,
+        borderColor: '#e5e7eb', // Ajout d'une bordure subtile
     },
     titleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingLeft: 30,
-        marginBottom: 10,
+        marginBottom: 20,
         position: 'relative',
     },
     title: {
         fontSize: 28,
-        color: 'royalblue',
-        fontWeight: '600',
-        letterSpacing: -1,
+        color: '#2563eb', // Couleur bleue plus douce
+        fontWeight: '700',
+        letterSpacing: -0.5,
         marginLeft: 8,
     },
     dot: {
@@ -242,10 +247,10 @@ const styles = StyleSheet.create({
         height: 18,
         width: 18,
         borderRadius: 50,
-        backgroundColor: 'royalblue',
+        backgroundColor: '#2563eb',
     },
     message: {
-        color: 'rgba(88, 87, 87, 0.822)',
+        color: '#6b7280', // Gris doux pour le texte secondaire
         fontSize: 14,
         marginBottom: 10,
         textAlign: 'center',
@@ -258,61 +263,63 @@ const styles = StyleSheet.create({
     inputContainer: {
         flex: 1,
         marginHorizontal: 5,
-        marginBottom: 15,
+        marginBottom: 20,
         position: 'relative',
     },
     input: {
         width: '100%',
-        padding: 15, // Increased padding for comfort
+        padding: 10,
         paddingTop: 20,
         borderWidth: 1,
-        borderColor: 'rgba(105, 105, 105, 0.7)',
+        borderColor: 'rgba(105, 105, 105, 0.397)',
         borderRadius: 10,
         fontSize: 16,
-        backgroundColor: '#f7f7f7',
+        color: 'black',
     },
     label: {
         position: 'absolute',
-        left: 15,
-        top: 15,
-        fontSize: 16,
-        color: 'gray',
-        backgroundColor: '#fff',
-        paddingHorizontal: 5,
-        transition: 'all 0.3s ease-in-out',
+        left: 12,
+        top: 18,
+        color: 'grey',
+        fontSize: 14,
+        transition: '0.2s',
     },
     labelFocused: {
         top: -5,
-        left: 10,
         fontSize: 12,
-        color: 'royalblue',
         fontWeight: '600',
+        color: 'royalblue',
     },
     submit: {
-        backgroundColor: 'royalblue',
+        backgroundColor: '#2563eb',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
         marginTop: 20,
     },
     submitText: {
-        color: '#fff',
+        color: '#ffffff',
         fontSize: 18,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     signin: {
         textAlign: 'center',
-        marginTop: 15,
-        color: 'gray',
+        marginTop: 20,
+        color: '#6b7280',
     },
     signinLink: {
-        color: 'royalblue',
-        fontWeight: '600',
+        color: '#2563eb',
+        fontWeight: '700',
     },
     picker: {
         height: 50,
         width: '100%',
+        borderColor: '#d1d5db',
+        borderWidth: 1,
+        borderRadius: 8,
+        marginTop: -5,
     },
 });
+
 
 export default SignupForm;

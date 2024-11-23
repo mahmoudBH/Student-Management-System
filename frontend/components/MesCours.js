@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 const MesCours = () => {
     const [cours, setCours] = useState([]);
@@ -27,7 +28,7 @@ const MesCours = () => {
         } catch (error) {
             console.log('Error:', error);
         } finally {
-            setRefreshing(false); // Arrêter le rafraîchissement une fois les données récupérées
+            setRefreshing(false);
         }
     };
 
@@ -37,35 +38,42 @@ const MesCours = () => {
 
     const onRefresh = () => {
         setRefreshing(true);
-        fetchCours(); // Relancer la récupération des cours
+        fetchCours();
     };
 
     const handleDownload = async (fileUrl) => {
-        if (!fileUrl || !/^https?:\/\//.test(fileUrl)) {
-            Alert.alert('Error', 'Invalid file URL. Please check the URL and try again.');
-            return;
-        }
-
         try {
-            const uri = `${FileSystem.documentDirectory}${fileUrl.split('/').pop()}`;
-            const download = FileSystem.createDownloadResumable(fileUrl, uri);
-            const { uri: localUri } = await download.downloadAsync();
-            console.log('Downloaded to:', localUri);
-            Alert.alert('Success', 'Course downloaded successfully!', [{ text: 'OK' }]);
+            const fileName = fileUrl.split('/').pop(); // Extraire le nom du fichier
+            const fileUri = FileSystem.documentDirectory + fileName; // Construire le chemin local du fichier
+
+            // Télécharger le fichier
+            const downloadResult = await FileSystem.downloadAsync(fileUrl, fileUri);
+
+            if (downloadResult.status === 200) {
+                // Vérifiez si le partage est disponible ou sauvegardez dans le dossier Download
+                if (await Sharing.isAvailableAsync()) {
+                    await Sharing.shareAsync(fileUri);
+                } else {
+                    Alert.alert('Download Complete', 'File saved, but sharing is not available.');
+                }
+            } else {
+                Alert.alert('Error', 'Failed to download course.');
+            }
         } catch (error) {
             console.error('Download error:', error);
-            Alert.alert('Error', 'An error occurred while downloading the course.');
+            Alert.alert('Error', 'Failed to download the file.');
         }
     };
 
     const renderCourse = ({ item }) => (
-        <TouchableOpacity onPress={() => handleDownload(`http://192.168.32.100:4000/${item.pdf_path}`)}>
-            <View style={styles.courseItem}>
-                <Text style={styles.courseTitle}>{item.matiere}</Text>
-                <Text style={styles.courseDescription}>Class: {item.classe}</Text>
-                <Text style={styles.courseDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
-            </View>
-        </TouchableOpacity>
+        <View style={styles.courseItem}>
+            <Text style={styles.courseTitle}>{item.matiere}</Text>
+            <Text style={styles.courseDescription}>Class: {item.classe}</Text>
+            <Text style={styles.courseDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
+            <TouchableOpacity onPress={() => handleDownload(item.fileUrl)}>
+                <Text style={styles.downloadLink}>Download Course</Text>
+            </TouchableOpacity>
+        </View>
     );
 
     return (
@@ -124,6 +132,12 @@ const styles = StyleSheet.create({
         color: '#9aa5b1',
         marginTop: 6,
         fontStyle: 'italic',
+    },
+    downloadLink: {
+        fontSize: 16,
+        color: '#007bff',
+        marginTop: 10,
+        textDecorationLine: 'underline',
     },
 });
 

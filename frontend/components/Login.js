@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Alert, RefreshControl } from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,StyleSheet,Animated,Dimensions,ScrollView,Alert,RefreshControl,} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -10,11 +11,13 @@ const Login = ({ setIsLoggedIn }) => {
     const [password, setPassword] = useState('');
     const [focusedInput, setFocusedInput] = useState({});
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [isLoggedIn, setIsLoggedInState] = useState(false);  // New state to track login status
+    const [isLoggedIn, setIsLoggedInState] = useState(false);
+
+    const navigation = useNavigation(); // Access navigation
 
     useEffect(() => {
         const animationLoop = Animated.loop(
-            Animated.sequence([ 
+            Animated.sequence([
                 Animated.timing(pulseAnim, { toValue: 1.8, duration: 1000, useNativeDriver: true }),
                 Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
             ])
@@ -27,7 +30,7 @@ const Login = ({ setIsLoggedIn }) => {
         const checkLogin = async () => {
             const token = await AsyncStorage.getItem('token');
             if (token) {
-                setIsLoggedInState(true);  // Update the state to reflect that the user is logged in
+                setIsLoggedInState(true);
             }
         };
         checkLogin();
@@ -66,7 +69,7 @@ const Login = ({ setIsLoggedIn }) => {
 
                 Alert.alert('Succès', 'Connexion réussie!');
                 setIsLoggedIn(true);
-                setIsLoggedInState(true);  // Set login state to true after successful login
+                setIsLoggedInState(true);
             } else {
                 Alert.alert('Erreur', 'Email ou mot de passe incorrect.');
             }
@@ -78,14 +81,10 @@ const Login = ({ setIsLoggedIn }) => {
 
     const onRefresh = () => {
         setIsRefreshing(true);
-        // Reset form fields
         setEmail('');
         setPassword('');
         setFocusedInput({});
-
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 1000); // Adjust the duration as needed
+        setTimeout(() => setIsRefreshing(false), 1000);
     };
 
     return (
@@ -114,10 +113,12 @@ const Login = ({ setIsLoggedIn }) => {
                             value={email}
                             onChangeText={setEmail}
                         />
-                        <Animated.Text style={[
-                            styles.label,
-                            focusedInput.email || email.length > 0 ? styles.labelFocused : {}
-                        ]}>
+                        <Animated.Text
+                            style={[
+                                styles.label,
+                                focusedInput.email || email.length > 0 ? styles.labelFocused : {},
+                            ]}
+                        >
                             Email
                         </Animated.Text>
                     </View>
@@ -131,10 +132,12 @@ const Login = ({ setIsLoggedIn }) => {
                             value={password}
                             onChangeText={setPassword}
                         />
-                        <Animated.Text style={[
-                            styles.label,
-                            focusedInput.password || password.length > 0 ? styles.labelFocused : {}
-                        ]}>
+                        <Animated.Text
+                            style={[
+                                styles.label,
+                                focusedInput.password || password.length > 0 ? styles.labelFocused : {},
+                            ]}
+                        >
                             Password
                         </Animated.Text>
                     </View>
@@ -146,14 +149,13 @@ const Login = ({ setIsLoggedIn }) => {
                         Don’t have an account?{' '}
                         <Text
                             style={styles.link}
-                            // No navigation, you can handle this manually if needed
+                            onPress={() => navigation.navigate('SignupForm')}
                         >
                             Sign Up
                         </Text>
                     </Text>
                 </View>
 
-                {/* Conditionally render Home page or a message based on login status */}
                 {isLoggedIn && (
                     <View style={styles.loggedInMessage}>
                         <Text style={styles.loggedInText}>Vous êtes connecté!</Text>
@@ -217,7 +219,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         position: 'relative',
         flex: 1,
-        marginBottom: 15,
+        marginBottom: 20,
         marginHorizontal: 5,
     },
     input: {
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
         transition: '0.2s',
     },
     labelFocused: {
-        top: 4,
+        top: -5,
         fontSize: 12,
         fontWeight: '600',
         color: 'royalblue',
@@ -274,7 +276,6 @@ const styles = StyleSheet.create({
     loggedInText: {
         fontSize: 18,
         color: 'green',
-    },
-});
+    },});
 
 export default Login;

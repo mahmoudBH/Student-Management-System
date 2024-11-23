@@ -18,8 +18,9 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(express.json());
-// Serve static files from the "uploads" directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configurez le répertoire d'uploads comme un dossier statique
+app.use('/uploads', express.static('C:\\Users\\mahmo\\OneDrive\\Bureau\\admin-app\\backend\\uploads'));
 
 // Initialize session
 app.use(session({
@@ -59,6 +60,8 @@ const storage = multer.diskStorage({
     }
 });
 
+// Middleware pour servir le dossier `uploads` de manière statique
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 const upload = multer({ storage: storage });
@@ -294,23 +297,49 @@ app.post('/api/cours', authenticateToken, upload.single('pdfFile'), (req, res) =
     });
 });
 
-// Route to retrieve courses by user class
 app.get('/api/mescours', authenticateToken, (req, res) => {
     const userId = req.user.id;
+
+    // SQL query pour récupérer la classe de l'utilisateur
     const userClassSql = 'SELECT class FROM users WHERE id = ?';
 
     db.query(userClassSql, [userId], (err, userResult) => {
-        if (err) return res.status(500).json({ success: false, message: 'Erreur lors de la récupération de la classe.' });
-        if (userResult.length === 0) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
+        if (err) {
+            console.error('Erreur lors de la récupération de la classe :', err);
+            return res.status(500).json({ success: false, message: 'Erreur serveur.' });
+        }
+
+        if (userResult.length === 0) {
+            return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
+        }
 
         const userClass = userResult[0].class;
-        const sql = 'SELECT *, CONCAT("http://192.168.32.100:4000/uploads/", pdf_path) AS fileUrl FROM cours WHERE classe = ?';
+
+        // SQL query pour récupérer les cours
+        const sql = `
+            SELECT 
+                id, 
+                matiere, 
+                classe, 
+                created_at, 
+                CONCAT('http://192.168.32.100:4000/uploads/', SUBSTRING_INDEX(pdf_path, '\\\\', -1)) AS fileUrl
+            FROM cours 
+            WHERE classe = ?
+        `;
+
         db.query(sql, [userClass], (err, results) => {
-            if (err) return res.status(500).json({ success: false, message: 'Erreur lors de la récupération des cours.' });
-            res.json(results);
+            if (err) {
+                console.error('Erreur lors de la récupération des cours :', err);
+                return res.status(500).json({ success: false, message: 'Erreur serveur.' });
+            }
+
+            res.status(200).json(results);
         });
     });
 });
+
+
+
 
 // Route to get contact details
 app.get('/api/contacts', (req, res) => {
