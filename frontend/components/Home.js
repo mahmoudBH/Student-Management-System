@@ -59,13 +59,70 @@ const Home = () => {
         if (isFocused) fetchData(); // Fetch data when focused
     }, [isFocused]);
 
-    const markCourseAsViewed = async (courseId) => {
-        // Optional: Add API call to mark the course as viewed
-    };
-
     const markNoteAsViewed = async (noteId) => {
-        // Optional: Add API call to mark the note as viewed
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                Alert.alert('Error', 'No token found. Please log in again.');
+                return;
+            }
+    
+            const response = await fetch(`http://192.168.32.100:4000/api/mark-note-viewed/${noteId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to mark note as viewed');
+            }
+    
+            const data = await response.json();
+            if (data.success) {
+                console.log('Note marked as viewed');
+            } else {
+                console.log('Note already viewed or not found');
+            }
+        } catch (error) {
+            console.error('Error marking note as viewed:', error);
+            Alert.alert('Error', 'Could not mark the note as viewed. Please try again later.');
+        }
     };
+    
+    const markCourseAsViewed = async (courseId) => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                Alert.alert('Error', 'No token found. Please log in again.');
+                return;
+            }
+    
+            const response = await fetch(`http://192.168.32.100:4000/api/mark-course-viewed/${courseId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to mark course as viewed');
+            }
+    
+            const data = await response.json();
+            if (data.success) {
+                console.log('Course marked as viewed');
+            } else {
+                console.log('Course already viewed or not found');
+            }
+        } catch (error) {
+            console.error('Error marking course as viewed:', error);
+            Alert.alert('Error', 'Could not mark the course as viewed. Please try again later.');
+        }
+    };
+    
 
     const handleNotificationClick = (item) => {
         // Remove the notification from the list
