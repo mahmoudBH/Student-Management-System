@@ -80,7 +80,7 @@ const CustomDrawerContent = ({ setIsLoggedIn, refreshData, isLoggedIn, ...props 
       )}
       <DrawerItemList {...props} />
       <View style={styles.copyrightContainer}>
-        <Text style={styles.copyrightText}>© 2024 Mahmoud Bousbih. Tous droits réservés.</Text>
+        <Text style={styles.copyrightText}>© 2024 Mahmoud Bousbih. All rights reserved.</Text>
       </View>
     </View>
   );
@@ -183,7 +183,7 @@ const App = () => {
               name="MesNotes"
               component={MesNotes}
               options={{
-                title: 'Mes Notes',
+                title: 'My Grades',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="notebook" color={color} size={20} />
                 ),
@@ -193,7 +193,7 @@ const App = () => {
               name="MesCours"
               component={MesCours}
               options={{
-                title: 'Mes Cours',
+                title: 'My Courses',
                 drawerIcon: ({ color }) => (
                   <MaterialCommunityIcons name="book-open" color={color} size={20} />
                 ),

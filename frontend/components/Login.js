@@ -263,8 +263,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     link: {
-        color: 'royalblue',
-        textDecorationLine: 'underline',
+        color: '#2563eb',
+        fontWeight: '700',
     },
     loggedInMessage: {
         padding: 20,

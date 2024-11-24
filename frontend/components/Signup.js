@@ -135,27 +135,27 @@ const SignupForm = ({ navigation }) => {
 
                     {/* Enhanced Class Picker */}
                     <View style={styles.inputContainer}>
-    <View style={[styles.input, styles.pickerContainer]}>
-        <Picker
-            selectedValue={selectedClass}
-            style={styles.picker}
-            onValueChange={(itemValue) => setSelectedClass(itemValue)}
-        >
-            <Picker.Item label="" value="" />
-            <Picker.Item label="TI11" value="TI11" />
-            <Picker.Item label="TI12" value="TI12" />
-            <Picker.Item label="TI13" value="TI13" />
-            <Picker.Item label="TI14" value="TI14" />
-            <Picker.Item label="DSI21" value="DSI21" />
-            <Picker.Item label="DSI22" value="DSI22" />
-            <Picker.Item label="DSI31" value="DSI31" />
-            <Picker.Item label="DSI32" value="DSI32" />
-        </Picker>
-    </View>
-    <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
-        Class
-    </Text>
-</View>
+                    <View style={[styles.input, styles.pickerContainer]}>
+                        <Picker
+                            selectedValue={selectedClass}
+                            style={styles.picker}
+                            onValueChange={(itemValue) => setSelectedClass(itemValue)}
+                        >
+                            <Picker.Item label="" value="" />
+                            <Picker.Item label="TI11" value="TI11" />
+                            <Picker.Item label="TI12" value="TI12" />
+                            <Picker.Item label="TI13" value="TI13" />
+                            <Picker.Item label="TI14" value="TI14" />
+                            <Picker.Item label="DSI21" value="DSI21" />
+                            <Picker.Item label="DSI22" value="DSI22" />
+                            <Picker.Item label="DSI31" value="DSI31" />
+                            <Picker.Item label="DSI32" value="DSI32" />
+                        </Picker>
+                    </View>
+                        <Text style={[styles.label, selectedClass ? styles.labelFocused : {}]}>
+                            Class
+                        </Text>
+                    </View>
 
 
                     <View style={styles.inputContainer}>

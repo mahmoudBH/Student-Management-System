@@ -43,14 +43,14 @@ const MesCours = () => {
 
     const handleDownload = async (fileUrl) => {
         try {
-            const fileName = fileUrl.split('/').pop(); // Extraire le nom du fichier
-            const fileUri = FileSystem.documentDirectory + fileName; // Construire le chemin local du fichier
+            const fileName = fileUrl.split('/').pop(); // Extract file name
+            const fileUri = FileSystem.documentDirectory + fileName; // Build local file path
 
-            // Télécharger le fichier
+            // Download the file
             const downloadResult = await FileSystem.downloadAsync(fileUrl, fileUri);
 
             if (downloadResult.status === 200) {
-                // Vérifiez si le partage est disponible ou sauvegardez dans le dossier Download
+                // Check if sharing is available or save in the Downloads folder
                 if (await Sharing.isAvailableAsync()) {
                     await Sharing.shareAsync(fileUri);
                 } else {
@@ -70,8 +70,8 @@ const MesCours = () => {
             <Text style={styles.courseTitle}>{item.matiere}</Text>
             <Text style={styles.courseDescription}>Class: {item.classe}</Text>
             <Text style={styles.courseDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
-            <TouchableOpacity onPress={() => handleDownload(item.fileUrl)}>
-                <Text style={styles.downloadLink}>Download Course</Text>
+            <TouchableOpacity style={styles.downloadButton} onPress={() => handleDownload(item.fileUrl)}>
+                <Text style={styles.downloadButtonText}>Download</Text>
             </TouchableOpacity>
         </View>
     );
@@ -133,11 +133,23 @@ const styles = StyleSheet.create({
         marginTop: 6,
         fontStyle: 'italic',
     },
-    downloadLink: {
-        fontSize: 16,
-        color: '#007bff',
+    downloadButton: {
         marginTop: 10,
-        textDecorationLine: 'underline',
+        backgroundColor: '#007bff',
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#007bff',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    downloadButtonText: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
