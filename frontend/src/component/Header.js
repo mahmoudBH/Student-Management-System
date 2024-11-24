@@ -40,6 +40,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
+        <img src="./images/education-people.png" alt="Logo" className="logo-image" />
         <h1 className="logo">Admin Panel</h1>
         <button className="menu-icon" onClick={toggleSidebar}>
           <img src="/icons/apps.svg" alt="Menu Icon" />
