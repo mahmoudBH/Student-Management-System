@@ -76,13 +76,13 @@ const AddCourseForm = () => {
     <CourseContainer>
       <Header /> {/* Include Header component */}
       <Form onSubmit={handleSubmit}>
-        <h2>Ajouter un Cours</h2>
+        <h2>Add a Course</h2>
 
         <div>
-          <label>Matiere</label>
+          <label>Subject</label>
           <select name="matiere" value={formValues.matiere} onChange={handleChange} required>
-            <option value="">Sélectionnez une matière</option>
-            <option value="developpement web">Développement Web</option>
+            <option value="">Select a subject</option>
+            <option value="developpement web">Web Development</option>
             <option value="JAVA">JAVA</option>
             <option value="SOA">SOA</option>
             <option value="JavaScript">JavaScript</option>
@@ -92,9 +92,9 @@ const AddCourseForm = () => {
         </div>
 
         <div>
-          <label>Classe</label>
+          <label>Class</label>
           <select name="classe" value={formValues.classe} onChange={handleChange} required>
-            <option value="">Sélectionnez une classe</option>
+            <option value="">Select a class</option>
             <option value="TI11">TI11</option>
             <option value="TI12">TI12</option>
             <option value="TI13">TI13</option>
@@ -107,11 +107,11 @@ const AddCourseForm = () => {
         </div>
 
         <div>
-          <label>Fichier PDF</label>
+          <label>PDF File</label>
           <input type="file" name="pdfFile" accept=".pdf" onChange={handleFileChange} required />
         </div>
 
-        <button type="submit" className='add-cours'>Ajouter le Cours</button>
+        <button type="submit" className='add-cours'>Add Course</button>
       </Form>
     </CourseContainer>
   );

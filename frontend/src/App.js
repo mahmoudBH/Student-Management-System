@@ -18,7 +18,7 @@ function App() {
           <Route path="/" element={<Login />} />               {/* Route par défaut vers Login */}
           <Route path="/signup" element={<Signup />} />        {/* Page d'inscription */}
           <Route path="/home" element={<Home />} />            {/* Page d'accueil */}
-          <Route path="/add-student" element={<AddStudentForm />} /> {/* Page pour ajouter un étudiant */}
+          <Route path="/add-note" element={<AddStudentForm />} /> {/* Page pour ajouter un étudiant */}
           <Route path="/edit-note" element={<EditNoteForm />} /> {/* Page pour modifier la note */}
           <Route path="/add-course" element={<AddCourseForm />} /> {/* Page pour ajouter un cours en PDF */}
           <Route path="/profile" element={<Profile />} />       {/* Page de profil */}

@@ -45,7 +45,7 @@
 .Profile-button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #007bff;
+  background-color: #2572cc;
   color: white;
   border: none;
   border-radius: 5px;
@@ -123,6 +123,7 @@
 /* Save photo button */
 .Profile-photo-container input[type="file"] {
   margin-top: 10px;
+  margin-left: 75px;
 }
 
 .Profile-photo-container .Profile-button {

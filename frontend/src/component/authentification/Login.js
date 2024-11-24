@@ -19,8 +19,9 @@ const Login = () => {
 
       // Check if the response contains user data
       if (response.data.user) {
-        // Store user data in local storage
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        // Store the entire user object in local storage (or just the name)
+        localStorage.setItem('user', JSON.stringify(response.data.user)); 
+        localStorage.setItem('userName', response.data.user.name); // Storing name separately
         setMessage('Login successful');
         window.location.href = '/home'; // Or use navigate('/home') if using react-router
       } else {
@@ -72,10 +73,10 @@ const Login = () => {
         .login-form {
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          max-width: 350px;
+          gap: 15px;
+          max-width: 450px; /* Increased max-width */
           background-color: #fff;
-          padding: 20px;
+          padding: 30px; /* Increased padding */
           border-radius: 20px;
           position: relative;
         }
@@ -142,8 +143,8 @@ const Login = () => {
         }
 
         .login-form label .input {
-          width: 90%;
-          padding: 10px 10px 20px 10px;
+          width: 95%;
+          padding: 12px 10px 22px 10px; /* Increased padding */
           outline: 0;
           border: 1px solid rgba(105, 105, 105, 0.397);
           border-radius: 10px;
@@ -178,11 +179,13 @@ const Login = () => {
           border: none;
           outline: none;
           background-color: royalblue;
-          padding: 10px;
+          padding: 12px; /* Padding for the button */
           border-radius: 10px;
           color: #fff;
           font-size: 16px;
           transform: .3s ease;
+          width: 95%;
+          margin: 10px 2px;
         }
 
         .submit:hover {

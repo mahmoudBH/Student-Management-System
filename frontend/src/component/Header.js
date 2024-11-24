@@ -81,11 +81,11 @@ const Header = () => {
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <ul className="sidebar-menu">
           <li><a href="/home"><img src="/icons/home.svg" alt="Home" /><span>Home</span></a></li>
-          <li><a href="/add-student"><img src="/icons/add-document.svg" alt="Add Note" /><span>Add Note</span></a></li>
+          <li><a href="/add-note"><img src="/icons/add-document.svg" alt="Add Note" /><span>Add Note</span></a></li>
           <li><a href="/edit-note"><img src="/icons/edit.svg" alt="Edit Notes" /><span>Edit Notes</span></a></li>
           <li><a href="/add-course"><img src="/icons/add.svg" alt="Add Course" /><span>Add Course</span></a></li>
-          <li><a href="/manage-student"><img src="/icons/member-list.svg" alt="Manage Student" /><span>Gérer Etudiant</span></a></li>
-          <li><a href="/messages"><img src="/icons/envelope.svg" alt="Messages" /><span>Mssages</span></a></li>
+          <li><a href="/manage-student"><img src="/icons/member-list.svg" alt="Manage Student" /><span>Manage Student</span></a></li>
+          <li><a href="/messages"><img src="/icons/envelope.svg" alt="Messages" /><span>Messages</span></a></li>
         </ul>
       </div>
     </header>

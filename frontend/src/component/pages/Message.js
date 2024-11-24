@@ -7,7 +7,7 @@ const Message = () => {
   const [messages, setMessages] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Vérifier la session utilisateur
+  // Check user session
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -19,7 +19,7 @@ const Message = () => {
           navigate('/');
         }
       } catch (error) {
-        console.error('Erreur lors de la vérification de la session:', error);
+        console.error('Error checking session:', error);
         navigate('/');
       }
     };
@@ -27,7 +27,7 @@ const Message = () => {
     checkSession();
   }, [navigate]);
 
-  // Fonction pour récupérer les messages
+  // Fetch messages
   const fetchMessages = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/messages', {
@@ -38,14 +38,14 @@ const Message = () => {
         const data = await response.json();
         setMessages(data);
       } else {
-        setErrorMessage("Erreur lors de la récupération des messages");
+        setErrorMessage("Error fetching messages");
       }
     } catch (error) {
-      setErrorMessage("Erreur lors de la récupération des messages");
+      setErrorMessage("Error fetching messages");
     }
   };
 
-  // Récupérer les messages lors de l'initialisation
+  // Fetch messages on initial load
   useEffect(() => {
     fetchMessages();
   }, []);
@@ -54,77 +54,103 @@ const Message = () => {
     <div className="message-container">
       <Header />
       {errorMessage && <p className="error-message">{errorMessage}</p>}
-      <h2>Messages de Support</h2>
+      <h2>Support Messages</h2>
       {messages.length > 0 ? (
-        <ul>
+        <ul className="message-list">
           {messages.map((msg) => (
             <li key={msg.id} className="message-item">
-              <strong>De:</strong> {msg.email}
-              <strong>Sujet:</strong> {msg.subject}
-              <strong>Message:</strong> {msg.message}
-              <strong>Reçu le:</strong> {new Date(msg.created_at).toLocaleString()}
+              <div className="message-header">
+                <strong>From:</strong> {msg.email}
+                <span>{new Date(msg.created_at).toLocaleString()}</span>
+              </div>
+              <h3>{msg.subject}</h3>
+              <p>{msg.message}</p>
             </li>
           ))}
         </ul>
       ) : (
-        <p>Aucun message disponible.</p>
+        <p>No messages available.</p>
       )}
 
-      {/* Styles CSS inclus dans le composant */}
+      {/* Modern CSS styles */}
       <style jsx>{`
         /* Message Page Styles */
-.message-container {
-  padding: 20px;
-  background-color: #f9f9f9; /* Light background color */
-  min-height: 100vh; /* Ensure the container covers the full height */
-  margin-top: 94px; /* Space for the fixed header */
-  margin-left: 260px; /* Space for the sidebar when open */
-  transition: margin-left 0.4s ease; /* Smooth transition when sidebar opens/closes */
-}
+        .message-container {
+          padding: 20px;
+          min-height: 100vh; /* Full page height */
+          margin-top: 94px; /* Space for the fixed header */
+          margin-left: 260px; /* Sidebar space */
+          transition: margin-left 0.4s ease;
+          font-family: 'Roboto', sans-serif; /* Modern font */
+          color: #333; /* Dark text for readability */
+        }
 
-@media (max-width: 768px) {
-  .message-container {
-    margin-left: 0; /* Remove left margin on smaller screens */
-    padding: 10px; /* Adjust padding on smaller screens */
-  }
-}
+        @media (max-width: 768px) {
+          .message-container {
+            margin-left: 0; /* No sidebar margin on mobile */
+            padding: 15px; /* Smaller padding */
+          }
+        }
 
-/* Ensure the message list looks good in the layout */
-h2 {
-  color: #333; /* Darker color for the heading */
-  margin-bottom: 20px; /* Space below the heading */
-}
+        h2 {
+          font-size: 2rem; /* Larger, bold heading */
+          font-weight: 600; /* Slightly bolder heading */
+          color: #2c3e50; /* Dark blue-grey color */
+          margin-bottom: 20px;
+        }
 
-.error-message {
-  color: #ff4d4d; /* Red color for error messages */
-  margin: 10px 0; /* Space around the error message */
-}
+        .error-message {
+          color: #e74c3c; /* Red for errors */
+          font-size: 1rem;
+          margin: 10px 0;
+        }
 
-ul {
-  list-style-type: none; /* Remove default bullet points */
-  padding: 0; /* Remove padding */
-}
+        .message-list {
+          list-style: none;
+          padding: 0;
+        }
 
-.message-item {
-  background-color: #fff; /* White background for each message */
-  border: 1px solid #ddd; /* Light border */
-  border-radius: 5px; /* Rounded corners */
-  padding: 15px; /* Padding inside the message */
-  margin-bottom: 15px; /* Space between messages */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-}
+        .message-item {
+          background-color: #fff;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+          transition: all 0.3s ease;
+        }
 
-.message-item strong {
-  display: block; /* Make labels display as block */
-  color: #555; /* Darker color for labels */
-  margin-bottom: 5px; /* Space below each label */
-}
+        .message-item:hover {
+          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Darker shadow on hover */
+        }
 
-.message-item p {
-  margin: 5px 0; /* Space around paragraphs */
-  color: #444; /* Text color for message content */
-}
+        .message-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 15px;
+          font-size: 1rem;
+          color: #7f8c8d; /* Light grey for meta text */
+        }
 
+        .message-header strong {
+          color: #34495e; /* Darker grey for labels */
+        }
+
+        .message-item h3 {
+          font-size: 1.3rem;
+          color: #2980b9; /* Blue for the subject */
+          font-weight: 500;
+          margin-bottom: 10px;
+        }
+
+        .message-item p {
+          font-size: 1rem;
+          color: #2c3e50; /* Main text color */
+          line-height: 1.6;
+        }
+
+        .message-item p + p {
+          margin-top: 10px;
+        }
       `}</style>
     </div>
   );

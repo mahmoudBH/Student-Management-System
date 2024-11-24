@@ -9,13 +9,13 @@ const AddStudentForm = () => {
     lastname: '',
     note: '',
     class: 'TI11',
-    matiere: 'developpement web',
+    subject: 'Web Development',
   });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
-  // Vérifier la session utilisateur
+  // Verify user session
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -27,7 +27,7 @@ const AddStudentForm = () => {
           navigate('/');
         }
       } catch (error) {
-        console.error('Erreur lors de la vérification de la session:', error);
+        console.error('Error verifying session:', error);
         navigate('/');
       }
     };
@@ -54,91 +54,93 @@ const AddStudentForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Étudiant ajouté avec succès!');
+        setMessage('Student added successfully!');
         setIsError(false);
         setFormData({
           firstname: '',
           lastname: '',
           note: '',
           class: '',
-          matiere: '',
+          subject: '',
         });
       } else {
-        setMessage(data.error || "Erreur lors de l'ajout de l'étudiant");
+        setMessage(data.error || 'Error adding the student');
         setIsError(true);
       }
     } catch (error) {
-      setMessage('Erreur de connexion au serveur');
+      setMessage('Server connection error');
       setIsError(true);
     }
   };
 
   return (
     <Container>
-      <Header /> 
+      <Header />
 
-      <Form onSubmit={handleSubmit}>
-        <h2>Ajouter la note de l'étudiant</h2>
-        <div>
-          <label>Prénom :</label>
-          <input
-            type="text"
-            name="firstname"
-            value={formData.firstname}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Nom :</label>
-          <input
-            type="text"
-            name="lastname"
-            value={formData.lastname}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Note :</label>
-          <input
-            type="number"
-            name="note"
-            value={formData.note}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Classe :</label>
-          <select name="class" value={formData.class} onChange={handleChange} required>
-            <option value="TI11">TI11</option>
-            <option value="TI12">TI12</option>
-            <option value="TI13">TI13</option>
-            <option value="TI14">TI14</option>
-            <option value="DSI21">DSI21</option>
-            <option value="DSI22">DSI22</option>
-            <option value="DSI31">DSI31</option>
-            <option value="DSI32">DSI32</option>
-          </select>
-        </div>
-        <div>
-          <label>Matière :</label>
-          <select name="matiere" value={formData.matiere} onChange={handleChange} required>
-            <option value="developpement web">Développement Web</option>
-            <option value="JAVA">JAVA</option>
-            <option value="SOA">SOA</option>
-            <option value="JavaScript">JavaScript</option>
-            <option value="React Native">React Native</option>
-            <option value="English">English</option>
-          </select>
-        </div>
-        <button type="submit">Ajouter</button>
-      </Form>
+      <Content>
+        <Form onSubmit={handleSubmit}>
+          <h2>Add Student Grade</h2>
+          <div>
+            <label>First Name:</label>
+            <input
+              type="text"
+              name="firstname"
+              value={formData.firstname}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Last Name:</label>
+            <input
+              type="text"
+              name="lastname"
+              value={formData.lastname}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Grade:</label>
+            <input
+              type="number"
+              name="note"
+              value={formData.note}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <label>Class:</label>
+            <select name="class" value={formData.class} onChange={handleChange} required>
+              <option value="TI11">TI11</option>
+              <option value="TI12">TI12</option>
+              <option value="TI13">TI13</option>
+              <option value="TI14">TI14</option>
+              <option value="DSI21">DSI21</option>
+              <option value="DSI22">DSI22</option>
+              <option value="DSI31">DSI31</option>
+              <option value="DSI32">DSI32</option>
+            </select>
+          </div>
+          <div>
+            <label>Subject:</label>
+            <select name="subject" value={formData.subject} onChange={handleChange} required>
+              <option value="Web Development">Web Development</option>
+              <option value="JAVA">JAVA</option>
+              <option value="SOA">SOA</option>
+              <option value="JavaScript">JavaScript</option>
+              <option value="React Native">React Native</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+          <button type="submit">Add</button>
+        </Form>
 
-      {message && (
-        <Message isError={isError}>{message}</Message>
-      )}
+        {message && (
+          <Message isError={isError}>{message}</Message>
+        )}
+      </Content>
     </Container>
   );
 };
@@ -148,26 +150,44 @@ export default AddStudentForm;
 // Styled components
 const Container = styled.div`
   display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 20px;
+  margin-left: 250px; /* Espace pour la sidebar */
+  margin-top: 70px; /* Espace pour le header */
+  font-family: Arial, sans-serif;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    margin-top: 50px;
+  }
+`;
+
+const Content = styled.div`
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 80px 20px 40px 280px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #e0f7fa, #ffffff);
-  font-family: Arial, sans-serif;
+  padding: 20px; /* Espace intérieur pour éviter que le formulaire touche les bords */
+  overflow: auto; /* Si le contenu est trop grand, permettre le défilement */
 `;
 
 const Form = styled.form`
   max-width: 500px;
   width: 100%;
-  margin: 100px auto;
   padding: 30px;
   background: linear-gradient(145deg, #ffffff, #e6e6e6);
   border-radius: 10px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s;
 
-  &:hover {
-    transform: scale(1.02);
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
   }
 
   div {
@@ -180,30 +200,25 @@ const Form = styled.form`
     color: #4a90e2;
     margin-bottom: 8px;
     font-size: 0.9rem;
-    text-transform: uppercase;
   }
 
-  input[type="text"],
-  input[type="number"],
+  input,
   select {
     width: 100%;
     padding: 12px;
     border: 1px solid #cccccc;
     border-radius: 5px;
-    font-size: 1rem;
     background: #f5f5f5;
-    color: #333;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1rem;
   }
 
   input:focus,
   select:focus {
     border-color: #4a90e2;
-    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
     outline: none;
   }
 
-  button[type="submit"] {
+  button {
     width: 100%;
     padding: 14px;
     background-color: #4a90e2;
@@ -213,17 +228,10 @@ const Form = styled.form`
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
 
-  button[type="submit"]:hover {
+  button:hover {
     background-color: #357abd;
-    box-shadow: 0 4px 10px rgba(53, 122, 189, 0.3);
-  }
-
-  button[type="submit"]:active {
-    transform: translateY(2px);
   }
 `;
 
@@ -234,4 +242,3 @@ const Message = styled.p`
   font-weight: bold;
   color: ${({ isError }) => (isError ? '#e74c3c' : '#27ae60')};
 `;
-

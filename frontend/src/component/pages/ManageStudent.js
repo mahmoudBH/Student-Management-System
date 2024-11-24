@@ -219,6 +219,8 @@ const ManageStudent = () => {
           border-radius: 5px;
           cursor: pointer;
           font-size: 0.9rem;
+          margin-left: 5px;
+
           transition: background-color 0.2s ease;
         }
 

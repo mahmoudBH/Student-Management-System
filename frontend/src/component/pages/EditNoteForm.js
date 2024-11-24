@@ -95,22 +95,22 @@ const EditNoteForm = () => {
   return (
     <div>
       <Header />
-      <h2>Liste des Notes</h2>
+      <h2>Notes List</h2>
       <table className="notes-table">
         <thead>
           <tr>
-            <th>Firstname</th>
-            <th>Lastname</th>
+            <th>First Name</th>
+            <th>Last Name</th>
             <th>Note</th>
             <th>Class</th>
-            <th>Matiere</th>
+            <th>Subject</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {notes.length === 0 ? (
             <tr>
-              <td colSpan="6">Aucune note à afficher.</td>
+              <td colSpan="6">No notes to display.</td>
             </tr>
           ) : (
             notes.map(note => (
@@ -172,8 +172,8 @@ const EditNoteForm = () => {
                       </select>
                     </td>
                     <td>
-                      <button onClick={handleSave}>Enregistrer</button>
-                      <button onClick={() => setEditingNoteId(null)}>Annuler</button>
+                      <button onClick={handleSave}>Save</button>
+                      <button onClick={() => setEditingNoteId(null)}>Cancel</button>
                     </td>
                   </>
                 ) : (
@@ -184,7 +184,7 @@ const EditNoteForm = () => {
                     <td>{note.class}</td>
                     <td>{note.matiere}</td>
                     <td>
-                      <button onClick={() => handleEdit(note)}>Modifier</button>
+                      <button onClick={() => handleEdit(note)}>Edit</button>
                     </td>
                   </>
                 )}
@@ -195,16 +195,18 @@ const EditNoteForm = () => {
       </table>
       <style>
         {`
+          /* Table styles */
           .notes-table {
-            width: 80%;
-            max-width: 900px;
-            margin: 90px auto;
+            width: 90%;  /* Default width */
+            max-width: 1200px; /* Max width for larger screens */
+            margin: 100px 280px; /* Adjusted margin to accommodate the fixed header */
             border-collapse: collapse;
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             overflow: hidden;
+            transition: width 0.3s ease; /* Smooth transition for width changes */
           }
 
           .notes-table thead {
@@ -272,8 +274,44 @@ const EditNoteForm = () => {
             text-align: center;
             font-size: 1.5rem;
           }
+
+          /* Sidebar open/close adjustment */
+          .sidebar.open ~ .notes-table {
+            width: calc(100% - 260px); /* Subtract sidebar width when it's open */
+          }
+
+          .sidebar.closed ~ .notes-table {
+            width: calc(100% - 80px); /* Adjust table width when sidebar is closed */
+          }
+
+          /* Responsive adjustments for table */
+          @media screen and (max-width: 768px) {
+            .notes-table {
+              width: 95%;
+              margin-top: 120px; /* Adjusted margin for small screens */
+            }
+
+            .notes-table th, .notes-table td {
+              padding: 8px;
+              font-size: 0.8rem;
+            }
+          }
+
+          @media screen and (max-width: 480px) {
+            .notes-table th, .notes-table td {
+              padding: 6px;
+              font-size: 0.75rem;
+            }
+
+            .notes-table {
+              width: 100%;
+              margin-top: 130px; /* Adjusted margin for smaller screens */
+            }
+          }
+
         `}
       </style>
+
     </div>
   );
 };
