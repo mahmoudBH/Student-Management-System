@@ -19,7 +19,7 @@ const Profile = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/check-session', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/check-session`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -40,7 +40,7 @@ const Profile = () => {
   // Fetch user data function
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/user', { credentials: 'include' });
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user`, { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setUser(data);
@@ -74,7 +74,7 @@ const Profile = () => {
     formData.append('photo', photo);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/user/${user.id}/photo`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/${user.id}/photo`, {
         method: 'PUT',
         credentials: 'include',
         body: formData,
@@ -100,7 +100,7 @@ const Profile = () => {
   // Save profile information
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/user/${user.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/user/${user.id}/password`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/${user.id}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

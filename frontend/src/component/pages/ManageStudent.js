@@ -15,7 +15,7 @@ const ManageStudent = () => {
   // Fetch students on load
   useEffect(() => {
     const fetchStudents = async () => {
-      const response = await fetch('http://localhost:5000/api/students');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/students`);
       const data = await response.json();
       setStudents(data);
     };
@@ -40,7 +40,7 @@ const ManageStudent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch(`http://localhost:5000/api/students/${selectedStudent.id}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/students/${selectedStudent.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ const ManageStudent = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this student?')) {
-      const response = await fetch(`http://localhost:5000/api/students/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/students/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {

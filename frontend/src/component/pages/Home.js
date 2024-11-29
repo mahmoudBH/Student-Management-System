@@ -19,7 +19,7 @@ const Home = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/check-session', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/check-session`, {
           method: 'GET',
           credentials: 'include', // Send cookies to verify the session
         });

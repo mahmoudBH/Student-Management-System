@@ -17,7 +17,7 @@ const EditNoteForm = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/check-session', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/check-session`, {
           method: 'GET',
           credentials: 'include', // Include credentials for the session
         });
@@ -36,7 +36,7 @@ const EditNoteForm = () => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/note', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/note`, {
           method: 'GET',
           credentials: 'include', // Include credentials for the session
         });
@@ -71,7 +71,7 @@ const EditNoteForm = () => {
   };
 
   const handleSave = async () => {
-    const response = await fetch(`http://localhost:5000/api/note/${editingNoteId}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/note/${editingNoteId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -20,7 +20,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/signup', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/signup`, { 
         name: `${firstName} ${lastName}`,
         email,
         password,
@@ -173,6 +173,11 @@ const Signup = () => {
         .message, .signin {
           color: rgba(88, 87, 87, 0.822);
           font-size: 14px;
+          text-align: center; /* Centre horizontalement */
+          display: flex; /* Utiliser flexbox */
+          justify-content: center; /* Centre horizontalement avec flexbox */
+          align-items: center; /* Centre verticalement avec flexbox */
+          height: 100%; /* Nécessaire si vous souhaitez centrer dans un conteneur avec une hauteur définie */
         }
 
         .signin {

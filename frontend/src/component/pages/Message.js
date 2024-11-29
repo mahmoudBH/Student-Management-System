@@ -11,7 +11,7 @@ const Message = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/check-session', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/check-session`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -30,7 +30,7 @@ const Message = () => {
   // Fetch messages
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/messages', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/messages`, {
         method: 'GET',
         credentials: 'include',
       });
