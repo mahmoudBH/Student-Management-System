@@ -10,7 +10,7 @@ const Support = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://192.168.32.100:4000/support', {
+      const response = await fetch('http://192.168.205.100:4000/support', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

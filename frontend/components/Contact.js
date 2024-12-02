@@ -10,7 +10,7 @@ const Contact = () => {
   const fetchContacts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.32.100:4000/api/contacts'); // Adjust port if needed
+      const response = await fetch('http://192.168.205.100:4000/api/contacts'); // Adjust port if needed
       const data = await response.json();
       setContacts(data);
     } catch (error) {

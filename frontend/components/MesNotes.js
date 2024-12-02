@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PushNotification from 'react-native-push-notification';
 
 const MesNotes = () => {
     const [notes, setNotes] = useState([]);
@@ -9,7 +10,7 @@ const MesNotes = () => {
     const fetchNotes = async () => {
         try {
             const token = await AsyncStorage.getItem('token');
-            const response = await fetch('http://192.168.32.100:4000/api/mesnotes', {
+            const response = await fetch('http://192.168.205.100:4000/api/mesnotes', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -20,6 +21,15 @@ const MesNotes = () => {
             if (response.ok) {
                 const data = await response.json();
                 setNotes(data);
+                
+                // Afficher une notification lorsque les notes sont récupérées
+                PushNotification.localNotification({
+                    title: "Notes mises à jour",
+                    message: `Vous avez ${data.length} notes disponibles.`,
+                    priority: "high",
+                    smallIcon: "ic_notification",
+                });
+
             } else {
                 console.log('Error fetching notes:', response.status);
             }

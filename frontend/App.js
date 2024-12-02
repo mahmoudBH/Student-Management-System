@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
-import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
+import { Audio } from 'expo-av';
 import Login from './components/Login';
 import SignupForm from './components/Signup';
 import Home from './components/Home';
@@ -13,6 +15,14 @@ import MesNotes from './components/MesNotes';
 import MesCours from './components/MesCours';
 import Contact from './components/Contact';
 import Support from './components/Support';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const Drawer = createDrawerNavigator();
 
@@ -25,7 +35,7 @@ const CustomDrawerContent = ({ setIsLoggedIn, refreshData, isLoggedIn, ...props 
     try {
       const token = await AsyncStorage.getItem('token');
       if (token) {
-        const response = await fetch('http://192.168.32.100:4000/api/profile', {
+        const response = await fetch('http://192.168.205.100:4000/api/profile', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -51,14 +61,6 @@ const CustomDrawerContent = ({ setIsLoggedIn, refreshData, isLoggedIn, ...props 
       fetchUserData();
     }
   }, [refreshData, isLoggedIn]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (isLoggedIn) {
-        fetchUserData();
-      }
-    }, [refreshData, isLoggedIn])
-  );
 
   return (
     <View style={styles.drawerContent}>
@@ -89,6 +91,7 @@ const CustomDrawerContent = ({ setIsLoggedIn, refreshData, isLoggedIn, ...props 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [refreshData, setRefreshData] = useState(false);
+  const [sound, setSound] = useState();
 
   const checkLoginStatus = async () => {
     try {
@@ -105,9 +108,67 @@ const App = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      setRefreshData(prev => !prev);
+      setRefreshData((prev) => !prev);
     }
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    const configureNotifications = async () => {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'Notifications par défaut',
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: 'default', // Utilisation du son par défaut
+        vibrationPattern: [0, 250, 250, 250], // Modèle de vibration
+        lightColor: '#FF231F7C', // Couleur de la lumière de notification
+      });
+    };
+
+    configureNotifications();
+
+    const ws = new WebSocket('ws://192.168.205.100:7000');
+
+    ws.onopen = () => {
+      console.log('Connecté au serveur WebSocket');
+    };
+
+    ws.onmessage = async (event) => {
+      const notification = JSON.parse(event.data);
+
+      // Jouer un son personnalisé à la réception d'une notification
+      const { sound } = await Audio.Sound.createAsync(
+        require('./assets/notification-iphone.mp3') // Remplacez par votre propre fichier son
+      );
+      setSound(sound);
+      await sound.playAsync();
+
+      // Planifier une notification système
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: notification.title || 'Nouvelle Notification',
+          body: notification.message,
+          sound: 'default',
+          data: { additionalData: notification.data || {} },
+        },
+        trigger: null, // Notification immédiate
+      });
+    };
+
+    ws.onerror = (error) => {
+      console.error('Erreur WebSocket:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('Connexion WebSocket fermée');
+    };
+
+    // Nettoyer la connexion WebSocket et le son lors du démontage du composant
+    return () => {
+      ws.close();
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
 
   return (
     <NavigationContainer>
@@ -226,7 +287,7 @@ const App = () => {
               options={{
                 title: 'Support',
                 drawerIcon: ({ color }) => (
-                  <MaterialCommunityIcons name="lifebuoy" color={color} size={20} />
+                  <MaterialCommunityIcons name="help-circle" color={color} size={20} />
                 ),
               }}
             />
@@ -239,7 +300,7 @@ const App = () => {
                 ),
               }}
             >
-              {() => <Logout setIsLoggedIn={setIsLoggedIn} />}
+              {(props) => <Logout {...props} setIsLoggedIn={setIsLoggedIn} />}
             </Drawer.Screen>
           </>
         )}

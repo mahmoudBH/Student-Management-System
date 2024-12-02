@@ -43,7 +43,7 @@ const Login = ({ setIsLoggedIn }) => {
         }
 
         try {
-            const response = await fetch('http://192.168.32.100:4000/api/login', {
+            const response = await fetch('http://192.168.205.100:4000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,23 +1,80 @@
 const express = require('express');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+const mysql = require('mysql');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
-const app = express();
 const fs = require('fs');
+const WebSocket = require('ws'); // Importer WebSocket pour la gestion des notifications
 
-const port = 4000;
+// Initialiser l'application Express
+const app = express();
+const PORT = process.env.PORT || 4000;
 
 // Middleware configuration
 app.use(cors({
-    origin: 'http://192.168.32.100:4000:8081',
-    credentials: true,
+  origin: 'http://192.168.205.100:4000:8081',
+  credentials: true,
 }));
 app.use(bodyParser.json());
 app.use(express.json());
+
+// Serveur WebSocket pour les clients mobiles
+const mobileSocketServer = new WebSocket.Server({ port: 7000 });
+console.log("Mobile WebSocket server running on port 7000");
+
+const mobileClients = new Set();
+mobileSocketServer.on('connection', (socket) => {
+  console.log("New mobile client connected");
+  mobileClients.add(socket);
+
+  socket.on('close', () => {
+    console.log("Mobile client disconnected");
+    mobileClients.delete(socket);
+  });
+});
+
+// Connexion WebSocket au serveur admin
+const adminSocket = new WebSocket('ws://localhost:6000');
+adminSocket.on('open', () => {
+  console.log("Connected to admin WebSocket server");
+});
+
+adminSocket.on('message', (message) => {
+  const notification = JSON.parse(message);
+
+  if (notification.type === 'NEW_COURSE') {
+    console.log("New course notification received:", notification.data);
+
+    // Envoyer la notification aux clients mobiles connectés
+    mobileClients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({
+          type: 'NOTIFICATION',
+          message: `New course added: ${notification.data.matiere} for class ${notification.data.classe}`,
+        }));
+      }
+    });
+  }
+
+  // Ajouter la gestion des notifications de note
+  if (notification.type === 'NEW_NOTE') {
+    console.log("New note notification received:", notification.data);
+
+    // Envoyer la notification aux clients mobiles connectés
+    mobileClients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({
+          type: 'NOTIFICATION',
+          message: `New note added for ${notification.data.firstname} ${notification.data.lastname} in ${notification.data.matiere}: ${notification.data.note}`,
+        }));
+      }
+    });
+  }
+});
+
 
 // Configurez le répertoire d'uploads comme un dossier statique
 app.use('/uploads', express.static('C:\\Users\\mahmo\\OneDrive\\Bureau\\admin-app\\backend\\uploads'));
@@ -206,7 +263,7 @@ app.get('/api/profile', authenticateToken, (req, res) => {
 
         const user = results[0];
         // Create the complete URL for the profile photo
-        user.profile_photo = user.profile_photo ? `http://192.168.32.100:4000/uploads/${user.profile_photo}` : null;
+        user.profile_photo = user.profile_photo ? `http://192.168.205.100:4000/uploads/${user.profile_photo}` : null;
 
         return res.status(200).json({ success: true, data: user });
     });
@@ -322,7 +379,7 @@ app.get('/api/mescours', authenticateToken, (req, res) => {
                 matiere, 
                 classe, 
                 created_at, 
-                CONCAT('http://192.168.32.100:4000/uploads/', SUBSTRING_INDEX(pdf_path, '\\\\', -1)) AS fileUrl
+                CONCAT('http://192.168.205.100:4000/uploads/', SUBSTRING_INDEX(pdf_path, '\\\\', -1)) AS fileUrl
             FROM cours 
             WHERE classe = ?
         `;
@@ -492,7 +549,13 @@ app.get('/api/unread-notifications', (req, res) => {
     });
   });
 
-// Start server
-app.listen(port, () => {
-    console.log(`Serveur démarré sur le port ${port}`);
+
+// Exemple d'endpoint pour tester le serveur
+app.get('/', (req, res) => {
+  res.send("Mobile backend is running");
+});
+
+// Démarrer le serveur Express
+app.listen(PORT, () => {
+  console.log(`Mobile server running on http://192.168.205.100:${PORT}`);
 });
