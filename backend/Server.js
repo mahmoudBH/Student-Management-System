@@ -1,38 +1,39 @@
 const express = require('express');
 const mysql = require('mysql2');
-const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
+const WebSocket = require('ws'); // Importer WebSocket pour envoyer des notifications
+const jwt = require('jsonwebtoken');
 
-// Initialize Express app
+// Initialiser Express
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with frontend origin
+  origin: 'http://localhost:3000', // Permettre l'accès depuis le frontend
   credentials: true,
 }));
 app.use(bodyParser.json());
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// Configure session
+// Configurer la session
 app.use(session({
   secret: 'your_secret', // Replace with a strong secret
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60, // Session duration: 1 hour
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+  maxAge: 1000 * 60 * 60, // Session duration: 1 hour
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
   }
 }));
 
-// Database connection
+// Connexion à la base de données
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -41,11 +42,8 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-  if (err) {
-    console.error('Database connection failed:', err);
-  } else {
-    console.log('Connected to gestion_etudiant database');
-  }
+  if (err) console.error('Database connection failed:', err);
+  else console.log('Connected to gestion_etudiant database');
 });
 
 // Configure multer for photo upload
@@ -63,21 +61,18 @@ const upload = multer({ storage });
 // Servir statiquement le dossier des images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-
-// Configuration de multer pour stocker les fichiers PDF avec la bonne extension
+// Configuration de Multer pour les téléchargements PDF
 const storagepdf = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Use the absolute path to the uploads directory
-    const uploadPath = path.join('C:', 'Users', 'mahmo', 'OneDrive', 'Bureau', 'admin-app', 'backend', 'uploads');
-    // Ensure the directory exists
-    fs.existsSync(uploadPath) || fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath); // Specify the upload path
+    const uploadPath = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    const fileExt = path.extname(file.originalname).toLowerCase();
-    cb(null, `${file.fieldname}-${Date.now()}${fileExt}`); // Unique filename for each PDF
+    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
   },
 });
+
 
 // Filtre pour accepter uniquement les fichiers PDF
 const pdfFilter = (req, file, cb) => {
@@ -91,18 +86,30 @@ const pdfFilter = (req, file, cb) => {
 // Utilisation de la configuration et du filtre avec multer
 const uploadpdf = multer({ storage: storagepdf, fileFilter: pdfFilter });
 
-
-
-// Session check middleware
+// Middleware pour vérifier la session
 function sessionCheck(req, res, next) {
-  if (req.session.user) {
-    next();
-  } else {
-    res.status(401).json({ message: 'Unauthorized access. Please log in.' });
-  }
+  if (req.session.user) next();
+  else res.status(401).json({ message: 'Unauthorized access. Please log in.' });
 }
 
-// Route to check session status
+// Connexion WebSocket pour notifier les clients mobiles et web
+const webSocketServer = new WebSocket.Server({ port: 6000 });
+
+webSocketServer.on('connection', (socket) => {
+  console.log('New client connected to WebSocket server');
+  socket.on('close', () => console.log('Client disconnected'));
+});
+
+// Fonction pour envoyer une notification via WebSocket
+function sendNotificationToMobile(notification) {
+  webSocketServer.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(notification));
+    }
+  });
+}
+
+// API pour vérifier la session
 app.get('/api/check-session', (req, res) => {
   if (req.session.user) {
     res.status(200).json({ message: 'Session valid' });
@@ -110,7 +117,6 @@ app.get('/api/check-session', (req, res) => {
     res.status(401).json({ message: 'Session invalid' });
   }
 });
-
 
 // Admin sign-up route
 app.post('/api/admin/signup', (req, res) => {
@@ -129,36 +135,30 @@ app.post('/api/admin/signup', (req, res) => {
   });
 });
 
-
+// API pour l'authentification des admins
 app.post('/api/admin/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Requête pour vérifier si l'email existe
   db.query('SELECT id, name, email, password FROM admin WHERE email = ?', [email], (err, results) => {
     if (err) {
-      return res.status(500).json({ message: 'Erreur de base de données' });
+      return res.status(500).json({ message: 'Database error' });
     }
 
-    // Vérifie si l'email correspond à un utilisateur
     if (results.length === 0) {
-      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const user = results[0];
 
-    // Vérifie si le mot de passe correspond
     if (user.password !== password) {
-      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Enregistre les informations de l'utilisateur dans la session
     req.session.user = { id: user.id, name: user.name, email: user.email };
 
-    return res.status(200).json({ user: req.session.user, message: 'Connexion réussie' });
+    return res.status(200).json({ user: req.session.user, message: 'Login successful' });
   });
 });
-
-
 
 // Admin logout route
 app.post('/api/admin/logout', (req, res) => {
@@ -170,37 +170,7 @@ app.post('/api/admin/logout', (req, res) => {
   });
 });
 
-// Add note route (protected by sessionCheck)
-app.post('/api/note', sessionCheck, (req, res) => {
-  const { firstname, lastname, note, class: studentClass, matiere } = req.body;
 
-  const queryCheckUser = 'SELECT id FROM users WHERE firstname = ? AND lastname = ?';
-  db.query(queryCheckUser, [firstname, lastname], (err, result) => {
-    if (err) {
-      console.error('Error checking user:', err);
-      return res.status(500).json({ error: 'Server error, please try again.' });
-    }
-
-    if (result.length === 0) {
-      return res.status(400).json({ error: 'User with this first and last name does not exist.' });
-    }
-
-    const userId = result[0].id;
-
-    const queryInsertNote = `
-      INSERT INTO note (userId, firstname, lastname, note, class, matiere)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    db.query(queryInsertNote, [userId, firstname, lastname, note, studentClass, matiere], (err, result) => {
-      if (err) {
-        console.error('Error adding note:', err);
-        return res.status(500).json({ error: 'Server error while adding the note.' });
-      }
-
-      res.status(201).json({ message: 'Note successfully added!' });
-    });
-  });
-});
 
 // Retrieve all notes (protected by sessionCheck)
 app.get('/api/note', sessionCheck, (req, res) => {
@@ -233,22 +203,25 @@ app.put('/api/note/:id', sessionCheck, (req, res) => {
   });
 });
 
-
-// Endpoint to add a new course with PDF upload (protected by sessionCheck)
+// API pour ajouter un cours
 app.post('/api/cours', sessionCheck, uploadpdf.single('pdfFile'), (req, res) => {
   const { matiere, classe } = req.body;
-  const pdfPath = req.file.path; // Path to the uploaded PDF file
+  const pdfPath = req.file.path;
 
-  // Insert course details into the database
   const query = 'INSERT INTO cours (matiere, classe, pdf_path) VALUES (?, ?, ?)';
-  
-  db.query(query, [matiere, classe, pdfPath], (err, result) => {
+  db.query(query, [matiere, classe, pdfPath], (err) => {
     if (err) {
       console.error("Error adding course:", err);
-      res.status(500).json({ message: "Error adding course" });
-    } else {
-      res.status(200).json({ message: "Course added successfully" });
+      return res.status(500).json({ message: "Error adding course" });
     }
+
+    // Envoyer une notification via WebSocket
+    sendNotificationToMobile({
+      type: 'NEW_COURSE',
+      data: { matiere, classe },
+    });
+
+    res.status(200).json({ message: "Course added successfully" });
   });
 });
 
@@ -279,7 +252,51 @@ app.get('/api/cours/:id/pdf', (req, res) => {
   });
 });
 
+// API pour ajouter une note et envoyer une notification
+app.post('/api/note', sessionCheck, (req, res) => {
+  const { firstname, lastname, note, class: studentClass, matiere } = req.body;
 
+  // Vérifier si l'utilisateur existe
+  const queryCheckUser = 'SELECT id FROM users WHERE firstname = ? AND lastname = ?';
+  db.query(queryCheckUser, [firstname, lastname], (err, result) => {
+    if (err) {
+      console.error('Error checking user:', err);
+      return res.status(500).json({ error: 'Server error, please try again.' });
+    }
+
+    if (result.length === 0) {
+      return res.status(400).json({ error: 'User with this first and last name does not exist.' });
+    }
+
+    const userId = result[0].id;
+
+    // Ajouter la note à la base de données
+    const queryInsertNote = `
+      INSERT INTO note (userId, firstname, lastname, note, class, matiere)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    db.query(queryInsertNote, [userId, firstname, lastname, note, studentClass, matiere], (err, result) => {
+      if (err) {
+        console.error('Error adding note:', err);
+        return res.status(500).json({ error: 'Server error while adding the note.' });
+      }
+
+      // Envoyer une notification via WebSocket
+      sendNotificationToMobile({
+        type: 'NEW_NOTE',
+        data: {
+          firstname,
+          lastname,
+          note,
+          class: studentClass,
+          matiere
+        },
+      });
+
+      res.status(201).json({ message: 'Note successfully added and notification sent!' });
+    });
+  });
+});
 
 // Route pour récupérer les données de l'utilisateur avec photo
 app.get('/api/user', (req, res) => {
@@ -451,7 +468,7 @@ app.get('/api/messages', (req, res) => {
   });
 });
 
-// Start the server
+// Démarrer le serveur Express
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Admin server running on http://localhost:${PORT}`);
 });

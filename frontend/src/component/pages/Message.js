@@ -93,10 +93,11 @@ const Message = () => {
         }
 
         h2 {
-          font-size: 2rem; /* Larger, bold heading */
-          font-weight: 600; /* Slightly bolder heading */
-          color: #2c3e50; /* Dark blue-grey color */
+          font-size: 2rem; /* Taille de police */
+          font-weight: 600; /* Légèrement plus gras */
+          color: #2c3e50; /* Bleu-gris foncé */
           margin-bottom: 20px;
+          text-align: center; /* Centrer le texte */
         }
 
         .error-message {

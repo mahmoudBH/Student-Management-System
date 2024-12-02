@@ -10,28 +10,35 @@ const AddCourseForm = () => {
     classe: '',
     pdfFile: null,
   });
-
+  
+  const [notification, setNotification] = useState('');
   const navigate = useNavigate();
 
-  // Vérifier la session utilisateur
+  // Initialize WebSocket connection
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/check-session`, {
-          method: 'GET',
-          credentials: 'include', // Sends cookies for session check
-        });
-        if (response.status !== 200) {
-          navigate('/'); // Redirect if session invalid
-        }
-      } catch (error) {
-        console.error('Erreur lors de la vérification de la session:', error);
-        navigate('/');
-      }
+    const socket = new WebSocket('ws://localhost:4000');  // WebSocket server URL
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
     };
 
-    checkSession();
-  }, [navigate]);
+    socket.onmessage = (event) => {
+      setNotification(event.data);  // Update state when a message is received
+    };
+
+    socket.onerror = (error) => {
+      console.log('WebSocket error: ', error);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Cleanup WebSocket connection when the component is unmounted
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +51,7 @@ const AddCourseForm = () => {
       setFormValues((prev) => ({ ...prev, pdfFile: file }));
     } else {
       alert("Veuillez télécharger un fichier PDF uniquement.");
-      setFormValues((prev) => ({ ...prev, pdfFile: null })); // Clear invalid file
+      setFormValues((prev) => ({ ...prev, pdfFile: null }));
     }
   };
 
@@ -59,11 +66,11 @@ const AddCourseForm = () => {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cours`, {
         method: 'POST',
         body: formData,
-        credentials: 'include', // Sends cookies for session validation
+        credentials: 'include',
       });
       if (response.ok) {
         alert('Cours ajouté avec succès!');
-        navigate('/add-course'); // Redirect to courses list or other page
+        navigate('/add-course');
       } else {
         alert("Erreur lors de l'ajout du cours.");
       }
@@ -74,7 +81,8 @@ const AddCourseForm = () => {
 
   return (
     <CourseContainer>
-      <Header /> {/* Include Header component */}
+      <Header />
+      {notification && <Notification>{notification}</Notification>}  {/* Display notification */}
       <Form onSubmit={handleSubmit}>
         <h2>Add a Course</h2>
 
@@ -117,11 +125,21 @@ const AddCourseForm = () => {
   );
 };
 
+const Notification = styled.div`
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+  border-radius: 6px;
+`;
+
 const CourseContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px 20px 260px; /* Reduced top padding to bring it higher */
+  padding: 40px 20px 20px 260px;
   min-height: 100vh;
   font-family: 'Roboto', sans-serif;
 `;
@@ -129,7 +147,7 @@ const CourseContainer = styled.div`
 const Form = styled.form`
   max-width: 500px;
   width: 100%;
-  margin-top: 60px; /* Centered vertically on the page, higher for better visibility */
+  margin-top: 60px;
   padding: 30px;
   border-radius: 12px;
   background-color: #ffffff;
@@ -203,17 +221,8 @@ const Form = styled.form`
     transform: translateY(2px);
   }
 
-  @media screen and (max-width: 600px) {
-    padding: 20px 10px;
-    margin-top: 80px;
-    
-    h2 {
-      font-size: 1.5rem;
-    }
-
-    .add-cours {
-      font-size: 0.9rem;
-    }
+  @media screen and (max-width: 768px) {
+    padding: 20px;
   }
 `;
 

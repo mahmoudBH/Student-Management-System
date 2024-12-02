@@ -9,7 +9,7 @@ const AddStudentForm = () => {
     lastname: '',
     note: '',
     class: 'TI11',
-    subject: 'Web Development',
+    matiere: 'Web Development',
   });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
@@ -50,7 +50,7 @@ const AddStudentForm = () => {
         credentials: 'include',
         body: JSON.stringify(formData),
       });
-      
+
       const data = await response.json();
 
       if (response.ok) {
@@ -61,7 +61,7 @@ const AddStudentForm = () => {
           lastname: '',
           note: '',
           class: '',
-          subject: '',
+          matiere: '',
         });
       } else {
         setMessage(data.error || 'Error adding the student');
@@ -125,7 +125,7 @@ const AddStudentForm = () => {
           </div>
           <div>
             <label>Subject:</label>
-            <select name="subject" value={formData.subject} onChange={handleChange} required>
+            <select name="subject" value={formData.matiere} onChange={handleChange} required>
               <option value="Web Development">Web Development</option>
               <option value="JAVA">JAVA</option>
               <option value="SOA">SOA</option>
@@ -135,11 +135,8 @@ const AddStudentForm = () => {
             </select>
           </div>
           <button type="submit">Add</button>
+          {message && <Message isError={isError}>{message}</Message>}
         </Form>
-
-        {message && (
-          <Message isError={isError}>{message}</Message>
-        )}
       </Content>
     </Container>
   );
@@ -168,8 +165,8 @@ const Content = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px; /* Espace intérieur pour éviter que le formulaire touche les bords */
-  overflow: auto; /* Si le contenu est trop grand, permettre le défilement */
+  padding: 20px;
+  overflow: auto;
 `;
 
 const Form = styled.form`
