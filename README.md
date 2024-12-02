@@ -1,6 +1,4 @@
-Here’s an example of a `README.md` for your **Student Management System** with separate sections for the **User App** and the **Admin App**.
 
----
 
 # Student Management System
 
