@@ -57,7 +57,7 @@ The system ensures smooth communication between students and administrators.
 - Mobile device with **Expo Go** or emulator
 
 ### Steps
-```bash
+bash
 git clone https://github.com/mahmoudBH/student-management-system.git
 cd student-management-system/user-app
 
