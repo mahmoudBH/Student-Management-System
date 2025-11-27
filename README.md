@@ -1,147 +1,203 @@
+# 🎓 Student Management System  
+A complete platform that allows **students** and **administrators** to manage academic information efficiently.  
+The system is composed of:
 
-# Student Management System
+- 📱 **User Mobile App** (React Native – Expo)  
+- 🖥️ **Admin Web App** (React.js)  
+- 🗄️ **Backend API** (Node.js + MySQL)
 
-## Overview
-
-The **Student Management System** consists of two main applications:
-1. **User App** (Mobile app built with React Native) - Allows students to view their grades, courses, and profiles, as well as interact with administrators.
-2. **Admin App** (Web app built with React.js) - Allows administrators to manage student grades, courses, and user accounts, and view messages sent by users.
-
-Both applications are powered by a common backend built with Node.js and MySQL.
-
----
-
-## 1. User App
-
-### Features
-- View personal grades and courses.
-- **Notification**: Receive notifications when new courses or grades are added.
-- **Download Courses**: Download course materials (PDFs or other formats).
-- **Contact Admin**: Send messages to the admin for support or inquiries.
-- Update personal profile information.
-- Change password functionality.
-- Upload and view profile photo.
-
-### Installation
-
-#### Requirements
-- Node.js (for React Native development)
-- Expo CLI (for running the app)
-- A mobile device or emulator for testing
-
-#### Steps
-1. Clone the repository:
-   ```
-   git clone https://github.com/mahmoudBH/student-management-system.git
-   cd student-management-system/user-app
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Start the app using Expo:
-   ```
-   expo start
-   ```
-
-4. Scan the QR code with the Expo Go app on your mobile device to run the app.
-
-### API Endpoints
-- **Profile**: Get and update user profile details.
-- **Change Password**: Change user’s password.
-- **Grades & Courses**: Retrieve the student’s grades and courses data from the backend.
-- **Notifications**: Receive notifications when courses or grades are added.
-- **Download Course**: Download course materials like PDFs.
-- **Contact Admin**: Send a message to the admin for support or inquiries.
+Both applications share the same database and provide real-time synchronization for grades, courses, messages, and profile management.
 
 ---
 
-## 2. Admin App
-
-### Features
-- Manage student grades and courses.
-- Add, update, and delete courses and student grades.
-- **Upload and View Profile Photo**: Admins can upload their profile photos and view the uploaded photo.
-- Manage user accounts (add/remove users).
-- **Read Messages**: Read messages sent by users through the contact feature.
-
-### Installation
-
-#### Requirements
-- Node.js (for React.js development)
-- A modern web browser (Chrome, Firefox, etc.)
-
-#### Steps
-1. Clone the repository:
-   ```
-   git clone https://github.com/mahmoudBH/student-management-system.git
-   cd student-management-system/admin-app
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Start the app:
-   ```
-   npm start
-   ```
-
-4. Open the web app in your browser at `http://localhost:3000`.
-
-### API Endpoints
-- **Add/Edit/Delete Courses**: Manage courses in the system.
-- **Manage Students**: Add or remove students and assign grades.
-- **Manage Users**: Create, update, or delete user accounts (admin functionalities).
-- **Upload Profile Photo**: Upload and view profile photos for admins.
-- **Read Messages**: Read messages sent by users through the contact feature.
+## 📌 Table of Contents
+- [🚀 Overview](#-overview)
+- [📱 User App (Mobile)](#-user-app-mobile)
+- [🖥️ Admin App (Web)](#-admin-app-web)
+- [🗄️ Backend Setup](#-backend-setup)
+- [🔌 API Endpoints](#-api-endpoints)
+- [🛠️ Technologies](#-technologies)
+- [📦 Installation](#-installation)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ---
 
-## Backend Setup
+## 🚀 Overview
+The Student Management System simplifies academic management through:
+
+✔ Viewing and managing **grades**, **courses**, and **profiles**  
+✔ Integrated **notifications** for new updates  
+✔ Secure authentication system  
+✔ Document download (PDF courses)  
+✔ Bi-directional messaging between students and admins  
+
+The system ensures smooth communication between students and administrators.
+
+---
+
+# 📱 User App (Mobile)
+
+## 🎯 Features
+- View personal **grades**  
+- View **courses** and download course materials (PDF, docs…)  
+- Receive **push notifications** when a new grade or course is added  
+- **Contact Admin** via integrated messaging  
+- Update **profile information**  
+- Change password  
+- Upload and display **profile photo**
+
+---
+
+## 🛠️ Installation (User App)
 
 ### Requirements
-- Node.js
-- MySQL
+- Node.js  
+- Expo CLI  
+- Mobile device with **Expo Go** or emulator
 
 ### Steps
-1. Clone the repository:
-   ```
-   git clone https://github.com/mahmoudBH/student-management-system.git
-   cd student-management-system/backend
-   ```
+```bash
+git clone https://github.com/mahmoudBH/student-management-system.git
+cd student-management-system/user-app
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+npm install
+expo start
+Scan the QR code using the Expo Go app.
 
-3. Set up the database:
-   - Import the provided SQL schema into MySQL.
+🖥️ Admin App (Web)
+🎯 Features
+Manage students, grades, and courses
 
-4. Configure the backend environment:
-   - Create a `.env` file and provide your MySQL credentials and JWT secret.
+Add / update / delete courses and grades
 
-5. Start the backend server:
-   ```
-   npm start
-   ```
+Upload and view profile photo (admin)
 
-The backend will run on `http://localhost:5000` for the Admin API and `http://localhost:4000` for the User API.
+Manage user accounts (CRUD)
 
----
+Read messages sent by students
 
-## Contributing
+Dashboard for viewing all academic data
 
-Feel free to fork this repository and submit pull requests with improvements or bug fixes. Ensure to follow best practices and include tests where applicable.
+🛠️ Installation (Admin App)
+Requirements
+Node.js
 
----
+Modern browser (Chrome, Firefox…)
 
-## License
+Steps
+bash
+Copier le code
+git clone https://github.com/mahmoudBH/student-management-system.git
+cd student-management-system/admin-app
 
+npm install
+npm start
+The app will run at:
+👉 http://localhost:3000
+
+🗄️ Backend Setup
+Requirements
+Node.js
+
+MySQL
+
+Steps
+bash
+Copier le code
+git clone https://github.com/mahmoudBH/student-management-system.git
+cd student-management-system/backend
+
+npm install
+1️⃣ Create the database
+Import the provided SQL schema into MySQL.
+
+2️⃣ Configure environment variables
+Create .env file:
+
+ini
+Copier le code
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=gestion_etudiant
+JWT_SECRET=your_secret_key
+3️⃣ Start the backend server
+bash
+Copier le code
+npm start
+Backend runs on:
+
+User API → http://localhost:4000
+
+Admin API → http://localhost:5000
+
+🔌 API Endpoints
+User App
+Profile:
+
+Get profile
+
+Update profile
+
+Change Password
+
+Grades & Courses (view assigned content)
+
+Notifications
+
+Download Course
+
+Contact Admin (send message)
+
+Admin App
+Add / Edit / Delete courses
+
+Add / Edit / Delete grades
+
+Manage user accounts (students & admins)
+
+Upload profile photo
+
+Read messages sent by students
+
+🛠️ Technologies
+Backend
+Node.js
+
+Express
+
+MySQL
+
+JWT
+
+Multer
+
+Mobile
+React Native (Expo)
+
+Axios
+
+React Navigation
+
+Web
+React.js
+
+Axios
+
+Context API / Hooks
+
+📦 Installation Summary
+Part	Tech	Start Command
+Backend	Node.js	npm start
+User Mobile App	React Native (Expo)	expo start
+Admin Web App	React.js	npm start
+
+🤝 Contributing
+Feel free to fork the repository and submit pull requests with improvements.
+Please follow coding best practices and include proper documentation.
+
+📄 License
 This project is licensed under the MIT License.
 
----
+© 2025 Mahmoud Bousbih
